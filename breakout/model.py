@@ -5,7 +5,6 @@ import torch.nn.functional as F
 class DQN(nn.Module):
     """
     DQN (Deep Q-Network)
-
     """
 
     def __init__(self):
