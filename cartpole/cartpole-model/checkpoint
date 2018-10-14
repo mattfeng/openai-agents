@@ -1,2 +1,0 @@
-model_checkpoint_path: "cartpole-model"
-all_model_checkpoint_paths: "cartpole-model"
