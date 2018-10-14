@@ -10,8 +10,9 @@ class DQN(nn.Module):
 
     def __init__(self):
         super(DQN, self).__init__()
-        # input size (210, 160, 3)
-        self.conv1 = nn.Conv2d(3, 32)
+        # input size (84, 84, 6)
+        # Takes the current and previous frames
+        self.conv1 = nn.Conv2d(6, 32)
         self.bn1 = nn.BatchNorm2d(32) # num_features = # channels
         self.conv2 = nn.Conv2d(32, 64)
         self.bn2 = nn.BatchNorm2d(64)
