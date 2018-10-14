@@ -14,12 +14,14 @@ from torchutils.bootstrap import bootstrap
 from torchutils.viz.display import Display
 import torchutils.models.rl as rl
 
+from model import DQN
+
 DISPLAY_WIDTH = 600
 DISPLAY_HEIGHT = 600
 
 transform = V.Compose([
     V.ToPILImage(),
-    V.Resize((160, 160)),
+    V.Resize((84, 84)),
     V.ToTensor()
 ])
 
@@ -33,30 +35,37 @@ def test(M):
     frame = transform(frame)
     done = False
 
-    while not done:
-        state = T.stack([frame, prev_frame], dim=2)
+    with T.no_grad():
+        while not done:
+            state = T.cat([frame, prev_frame], dim=0)
 
-        print(env.action_space.sample())
+            eps = 0.1
+            action = rl.epsilon_greedy(
+                M.env.action_space.n, state, M.model, eps)
 
-        eps = 0.1
-        action = rl.epsilon_greedy(
-            M.env.action_space.n, state, M.model, eps)
+            prev_frame = T.tensor(frame)
+            frame, reward, done, _ = env.step(action)
 
-        prev_frame = T.tensor(frame)
-        frame, reward, done, _ = env.step(action)
-        frame = transform(frame)
+            frame = transform(frame)
 
-        M.display.draw_torchvision(frame, 0, 0)
+            M.display.draw_pytorch_tensor(frame, 0, 0)
+            action_label = "[i] action: {}".format(M.action_db[action])
+            M.display.draw_text(action_label, 10, DISPLAY_HEIGHT - 30)
 
-        env.render()
-        time.sleep(0.1)
+            time.sleep(0.05)
 
 @bootstrap.main
 def main(*args, **kwargs):
     M = kwargs["M"]
-    M.display = Display(DISPLAY_WIDTH, DISPLAY_HEIGHT)
     M.env = gym.make("BreakoutDeterministic-v4")
-    M.model = lambda x: np.random.randint(4)
+    M.model = DQN()
+    M.display = Display("breakout", DISPLAY_WIDTH, DISPLAY_HEIGHT)
+    M.action_db = {
+        0: "0",
+        1: "1",
+        2: "Right",
+        3: "Left"
+    }
 
     test(M)
 
