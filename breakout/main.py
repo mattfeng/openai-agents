@@ -26,9 +26,20 @@ transform = V.Compose([
 ])
 
 def train(M):
-    pass
+    print("[*] -- training mode --")
+    env = M.env
+    prev_frame = transform(env.reset())
+    frame, _, _, _ = env.step(env.action_space.sample())
+    frame = transform(frame)
+    done = False
+
+    M.model.train()
+    
+
+
 
 def test(M):
+    print("[*] -- testing mode --")
     env = M.env
     prev_frame = transform(env.reset())
     frame, _, _, _ = env.step(env.action_space.sample())
@@ -44,7 +55,7 @@ def test(M):
                 M.env.action_space.n, state, M.model, eps)
 
             prev_frame = T.tensor(frame)
-            frame, reward, done, _ = env.step(action)
+            frame, _, done, _ = env.step(action)
 
             frame = transform(frame)
 
@@ -59,6 +70,7 @@ def main(*args, **kwargs):
     M = kwargs["M"]
     M.env = gym.make("BreakoutDeterministic-v4")
     M.model = DQN()
+    M.memory = rl.ReplayMemory(10000)
     M.display = Display("breakout", DISPLAY_WIDTH, DISPLAY_HEIGHT)
     M.action_db = {
         0: "0",
@@ -67,7 +79,11 @@ def main(*args, **kwargs):
         3: "Left"
     }
 
-    test(M)
+    EPOCHS = 100
+
+    for epoch in range(EPOCHS):
+        train(M)
+        test(M)
 
 if __name__ == "__main__":
     main()
