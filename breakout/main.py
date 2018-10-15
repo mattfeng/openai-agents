@@ -171,6 +171,7 @@ def test(M):
     frame, _, _, _ = env.step(env.action_space.sample())
     frame = transform(frame)
     done = False
+    consecutive_same = 0
 
     with T.no_grad():
         t = 0
@@ -184,8 +185,19 @@ def test(M):
 
             prev_frame = T.tensor(frame)
             frame, _, done, _ = env.step(action)
-
             frame = transform(frame)
+
+            same = T.all(T.lt(
+                T.abs(T.add(prev_frame, -frame)), 1e-8)).item()
+
+            if same == 0:
+                consecutive_same = 0
+            else:
+                consecutive_same += 1
+
+            if consecutive_same > 40:
+                done = True
+                t -= 40
 
             action_label = "[i] action: {}".format(M.action_db[action])
             if DISPLAY_ENABLED:
