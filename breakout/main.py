@@ -32,7 +32,7 @@ BATCH_SIZE = 128
 GAMMA = 0.999
 EPS_START = 0.99
 EPS_END = 0.05
-EPS_DECAY = 2000
+EPS_DECAY = 1e6
 TARGET_UPDATE = 10
 
 transform = V.Compose([
@@ -124,7 +124,7 @@ def train(M):
         prev_frame = T.tensor(frame)
         frame, reward, done, _ = env.step(action)
         frame = transform(frame)
-        reward = T.tensor([reward], device=M.device)
+        reward = T.tensor([np.sign(int(reward))], device=M.device)
 
         same = T.all(T.lt(
             T.abs(T.add(prev_frame, -frame)), 1e-8)).item()
@@ -185,7 +185,7 @@ def test(M):
             state = T.cat([frame, prev_frame], dim=0)
             state = state.to(M.device)
 
-            eps = 0.0
+            eps = 0.1
             action, was_random = rl.epsilon_greedy(
                 M.env.action_space.n, state, M.policy, eps)
 
@@ -209,8 +209,6 @@ def test(M):
             if DISPLAY_ENABLED:
                 M.display.draw_pytorch_tensor(frame, 0, 0)
                 M.display.draw_text(action_label, 10, DISPLAY_HEIGHT - 30)
-            else:
-                print(action_label, action)
             
             t += 1
     return t
@@ -238,7 +236,7 @@ def main(*args, **kwargs):
         3: "Left"
     }
 
-    M.optim(optim.RMSprop(M.policy.parameters(), lr=1e-4, alpha=0.999))
+    M.optim(optim.RMSprop(M.policy.parameters(), lr=0.00025, alpha=0.95))
     M.steps = 0
 
     durations = []
