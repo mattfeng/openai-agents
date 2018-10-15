@@ -124,7 +124,7 @@ def train(M):
         prev_frame = T.tensor(frame)
         frame, reward, done, _ = env.step(action)
         frame = transform(frame)
-        reward = T.tensor([np.sign(int(reward))], device=M.device)
+        reward = T.tensor([float(np.sign(int(reward))], device=M.device)
 
         same = T.all(T.lt(
             T.abs(T.add(prev_frame, -frame)), 1e-8)).item()
