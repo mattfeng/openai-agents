@@ -83,6 +83,7 @@ def optimize_model(M):
     loss = F.smooth_l1_loss(
         state_action_values,
         expected_state_action_values.unsqueeze(1))
+    
 
     # Optimize the model
     M.optim().zero_grad()
@@ -93,6 +94,8 @@ def optimize_model(M):
 
     if M.steps % 20 == 0:
         print("[x] finish optimizing: step {}".format(M.steps))
+    
+    return loss
 
 def train(M):
     print("[*] -- training mode --")
@@ -106,6 +109,7 @@ def train(M):
     done = False
     M.policy.train()
     consecutive_same = 0
+    total_loss = 0
 
     for t in count():
         # Decrease the chance of random action as training progresses
@@ -150,7 +154,7 @@ def train(M):
         state = next_state
         M.steps += 1
 
-        optimize_model(M)
+        total_loss += optimize_model(M)
 
         if done:
             duration += t + 1
@@ -160,7 +164,7 @@ def train(M):
     if M.epoch % TARGET_UPDATE == 0:
         M.target.load_state_dict(M.policy.state_dict())
     
-    return duration
+    return duration, total_loss / duration
 
 def test(M):
     print("[*] -- testing mode --")
@@ -236,10 +240,10 @@ def main(*args, **kwargs):
     test_durations = []
     for epoch in range(EPOCHS):
         M.epoch = epoch
-        duration = train(M)
+        duration, avg_loss = train(M)
         durations.append(duration)
-        print("[train/{}] duration: {}, total steps: {}, eps: {:0.2f}".format(
-            epoch, duration, M.steps, M.eps))
+        print("[train/{}] duration: {}, total steps: {}, avg loss: {:0.6f}, eps: {:0.2f}".format(
+            epoch, duration, M.steps, avg_loss, M.eps))
         test_duration = test(M)
         test_durations.append(test_duration)
         print("[test/{}] test_duration: {}".format(epoch, test_duration))
