@@ -79,7 +79,6 @@ def optimize_model(M):
 
     # Compute the expected Q values
     expected_state_action_values = reward_batch + (GAMMA * next_state_values)
-    print("E[]:", expected_state_action_values)
 
     loss = F.smooth_l1_loss(
         state_action_values,
@@ -121,6 +120,7 @@ def train(M):
         state = state.to(M.device)
         action, was_random  = rl.epsilon_greedy(
             env.action_space.n, state, M.policy, eps)
+        action += 1
         
         prev_frame = T.tensor(frame)
         frame, reward, done, _ = env.step(action)
@@ -133,8 +133,6 @@ def train(M):
         if same == 0:
             consecutive_same = 0
         else:
-            if action == 0:
-                reward -= 10
             consecutive_same += 1
 
         if consecutive_same > 40:
@@ -191,6 +189,7 @@ def test(M):
             eps = 0.0
             action, was_random = rl.epsilon_greedy(
                 M.env.action_space.n, state, M.policy, eps)
+            action += 1
 
             prev_frame = T.tensor(frame)
             frame, _, done, _ = env.step(action)

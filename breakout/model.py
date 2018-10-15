@@ -22,7 +22,7 @@ class DQN(nn.Module):
         self.conv3 = nn.Conv2d(64, 10, kernel_size=1)
         self.bn3 = nn.BatchNorm2d(10)
         self.fc1 = nn.Linear(15210, 300)
-        self.fc2 = nn.Linear(300, 4)
+        self.fc2 = nn.Linear(300, 3)
 
     def forward(self, x):
         """
