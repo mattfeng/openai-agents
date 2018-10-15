@@ -105,12 +105,15 @@ def train(M):
     state = T.cat([frame, prev_frame], dim=0)
     done = False
     M.policy.train()
+    consecutive_same = 0
 
     for t in count():
+        # Decrease the chance of random action as training progresses
         eps = EPS_END + (EPS_START - EPS_END) * \
             math.exp(-1. * M.steps / EPS_DECAY)
         M.eps = eps
 
+        # Compute an action using the epsilon greedy procedure
         state = state.to(M.device)
         action, was_random  = rl.epsilon_greedy(
             env.action_space.n, state, M.policy, eps)
@@ -119,6 +122,18 @@ def train(M):
         frame, reward, done, _ = env.step(action)
         frame = transform(frame)
         reward = T.tensor([reward], device=M.device)
+
+        same = T.all(T.lt(
+            T.abs(T.add(prev_frame, -frame)), 1e-8)).item()
+
+        if same == 0:
+            consecutive_same = 0
+        else:
+            consecutive_same += 1
+
+        if consecutive_same > 40:
+            done = True
+            t -= 40
 
         if DISPLAY_ENABLED:
             M.display.draw_pytorch_tensor(frame, 0, 0)
@@ -163,7 +178,7 @@ def test(M):
             state = T.cat([frame, prev_frame], dim=0)
             state = state.to(M.device)
 
-            eps = 0.1
+            eps = 0.0
             action, was_random = rl.epsilon_greedy(
                 M.env.action_space.n, state, M.policy, eps)
 
@@ -172,10 +187,12 @@ def test(M):
 
             frame = transform(frame)
 
+            action_label = "[i] action: {}".format(M.action_db[action])
             if DISPLAY_ENABLED:
                 M.display.draw_pytorch_tensor(frame, 0, 0)
-                action_label = "[i] action: {}".format(M.action_db[action])
                 M.display.draw_text(action_label, 10, DISPLAY_HEIGHT - 30)
+            else:
+                print(action_label)
             
             t += 1
     return t
@@ -184,7 +201,7 @@ def test(M):
 @bootstrap.main
 def main(*args, **kwargs):
     M = kwargs["M"]
-    M.env = gym.make("BreakoutDeterministic-v4")
+    M.env = gym.make("Breakout-v4")
 
     M.policy = DQN()
     M.target = DQN()
