@@ -15,7 +15,7 @@ from itertools import count
 
 import os
 import sys
-sys.path.append("/Users/mattfeng/torchutils/")
+sys.path.append("{}/torchutils/".format(os.environ["HOME"]))
 from torchutils.bootstrap import bootstrap
 from torchutils.viz.display import Display
 import torchutils.models.rl as rl
@@ -57,6 +57,10 @@ def optimize_model(M):
     state_batch = T.cat(batch.state)
     action_batch = T.cat(batch.action)
     reward_batch = T.cat(batch.reward)
+
+    state_batch = state_batch.to(M.device)
+    action_batch = action_batch.to(M.device)
+    reward_batch = reward_batch.to(M.device)
 
     # - examples on the 0th axis, values on the 1st axis
     # - get the output of our model -- what does it believe
