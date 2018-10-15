@@ -30,7 +30,7 @@ DISPLAY_HEIGHT = 600
 EPOCHS = 1000
 BATCH_SIZE = 128
 GAMMA = 0.999
-EPS_START = 0.9
+EPS_START = 0.99
 EPS_END = 0.05
 EPS_DECAY = 2000
 TARGET_UPDATE = 10
@@ -130,6 +130,7 @@ def train(M):
             consecutive_same = 0
         else:
             consecutive_same += 1
+            reward -= 10
 
         if consecutive_same > 40:
             done = True
@@ -168,7 +169,7 @@ def test(M):
     print("[*] -- testing mode --")
     env = M.env
     prev_frame = transform(env.reset())
-    frame, _, _, _ = env.step(env.action_space.sample())
+    frame, _, _, _ = env.step(0)
     frame = transform(frame)
     done = False
     consecutive_same = 0
@@ -204,7 +205,7 @@ def test(M):
                 M.display.draw_pytorch_tensor(frame, 0, 0)
                 M.display.draw_text(action_label, 10, DISPLAY_HEIGHT - 30)
             else:
-                print(action_label)
+                print(action_label, action)
             
             t += 1
     return t
@@ -220,6 +221,7 @@ def main(*args, **kwargs):
     M.target.eval()
     M.policy.to(M.device)
     M.target.to(M.device)
+    M.log = open("log-{:.0f}.txt".format(time.time()))
 
     M.memory = rl.ReplayMemory(10000)
     if DISPLAY_ENABLED:
@@ -245,9 +247,16 @@ def main(*args, **kwargs):
         test_duration = test(M)
         test_durations.append(test_duration)
         print("[test/{}] test_duration: {}".format(epoch, test_duration))
+
+        # Save model
         save_path = "models/model-epoch-{}-time-{:.0f}.pt".format(
             epoch, time.time())
         T.save(M.policy.state_dict(), save_path)
+
+        # Log training progress
+        M.log.write("epoch, {}, train_dur, {}, test_dur, {}\n".format(
+            epoch, duration, test_duration
+        ))
 
 
 if __name__ == "__main__":
