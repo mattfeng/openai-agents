@@ -155,6 +155,7 @@ def test(M):
     done = False
 
     with T.no_grad():
+        t = 0
         while not done:
             state = T.cat([frame, prev_frame], dim=0)
             state = state.to(M.device)
@@ -172,8 +173,11 @@ def test(M):
                 M.display.draw_pytorch_tensor(frame, 0, 0)
                 action_label = "[i] action: {}".format(M.action_db[action])
                 M.display.draw_text(action_label, 10, DISPLAY_HEIGHT - 30)
+            
+            t += 1
+    return t
+    
 
-            time.sleep(0.05)
 
 @bootstrap.main
 def main(*args, **kwargs):
@@ -200,13 +204,17 @@ def main(*args, **kwargs):
     M.steps = 0
 
     durations = []
+    test_durations = []
     for epoch in range(EPOCHS):
         M.epoch = epoch
         duration = train(M)
         durations.append(duration)
         print("[train/{}] duration: {}, total steps: {}".format(
             epoch, duration, M.steps))
-        test(M)
+        test_duration = test(M)
+        test_durations.append(test_duration)
+        print("[test/{}] test_duration: {}".format(epoch, test_duration))
+
 
 if __name__ == "__main__":
     main()
