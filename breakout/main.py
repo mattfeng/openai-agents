@@ -58,6 +58,7 @@ def optimize_model(M):
     action_batch = T.cat(batch.action)
     reward_batch = T.cat(batch.reward)
 
+    non_final_next_states = non_final_next_states.to(M.device)
     state_batch = state_batch.to(M.device)
     action_batch = action_batch.to(M.device)
     reward_batch = reward_batch.to(M.device)
