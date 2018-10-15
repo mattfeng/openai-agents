@@ -27,7 +27,7 @@ DISPLAY_ENABLED = os.environ['DISP'] == 'Y'
 DISPLAY_WIDTH = 600
 DISPLAY_HEIGHT = 600
 
-EPOCHS = 100
+EPOCHS = 1000
 BATCH_SIZE = 128
 GAMMA = 0.999
 EPS_START = 0.9
@@ -179,7 +179,6 @@ def test(M):
             
             t += 1
     return t
-    
 
 
 @bootstrap.main
@@ -217,6 +216,9 @@ def main(*args, **kwargs):
         test_duration = test(M)
         test_durations.append(test_duration)
         print("[test/{}] test_duration: {}".format(epoch, test_duration))
+        save_path = "models/model-epoch-{}-time-{}.pt".format(
+            epoch, time.time())
+        T.save(M.policy.state_dict(), PATdH)
 
 
 if __name__ == "__main__":
