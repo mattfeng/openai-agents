@@ -79,6 +79,7 @@ def optimize_model(M):
 
     # Compute the expected Q values
     expected_state_action_values = reward_batch + (GAMMA * next_state_values)
+    print("E[]:", expected_state_action_values)
 
     loss = F.smooth_l1_loss(
         state_action_values,
@@ -128,18 +129,17 @@ def train(M):
 
         same = T.all(T.lt(
             T.abs(T.add(prev_frame, -frame)), 1e-8)).item()
-        
-        if action != 0:
-            reward += 0.1
 
         if same == 0:
             consecutive_same = 0
         else:
+            if action == 0:
+                reward -= 10
             consecutive_same += 1
 
         if consecutive_same > 40:
             done = True
-            t -= 40
+            duration -= 40
 
         if DISPLAY_ENABLED:
             M.display.draw_pytorch_tensor(frame, 0, 0)
@@ -164,7 +164,7 @@ def train(M):
             optimize_model(M)
 
         if done:
-            duration = t + 1
+            duration += t + 1
             break
 
     # Update the target network
