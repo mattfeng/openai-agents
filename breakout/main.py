@@ -13,6 +13,7 @@ import time
 import math
 from itertools import count
 
+import os
 import sys
 sys.path.append("/Users/mattfeng/torchutils/")
 from torchutils.bootstrap import bootstrap
@@ -20,6 +21,8 @@ from torchutils.viz.display import Display
 import torchutils.models.rl as rl
 
 from model import DQN, Transition
+
+DISPLAY_ENABLED = os.environ['DISP'] == 'Y'
 
 DISPLAY_WIDTH = 600
 DISPLAY_HEIGHT = 600
@@ -100,6 +103,7 @@ def train(M):
         eps = EPS_END + (EPS_START - EPS_END) * \
             math.exp(-1. * M.steps / EPS_DECAY)
 
+        state = state.to(M.device)
         action, was_random  = rl.epsilon_greedy(
             env.action_space.n, state, M.policy, eps)
         
@@ -108,11 +112,12 @@ def train(M):
         frame = transform(frame)
         reward = T.tensor([reward], device=M.device)
 
-        M.display.draw_pytorch_tensor(frame, 0, 0)
-        action_label = "[i] action: {}".format(M.action_db[action])
-        M.display.draw_text(action_label, 10, DISPLAY_HEIGHT - 30)
-        eps_label = "[i] eps: {:0.2f} (random? {})".format(eps, was_random)
-        M.display.draw_text(eps_label, 10, DISPLAY_HEIGHT - 70)
+        if DISPLAY_ENABLED:
+            M.display.draw_pytorch_tensor(frame, 0, 0)
+            action_label = "[i] action: {}".format(M.action_db[action])
+            M.display.draw_text(action_label, 10, DISPLAY_HEIGHT - 30)
+            eps_label = "[i] eps: {:0.2f} (random? {})".format(eps, was_random)
+            M.display.draw_text(eps_label, 10, DISPLAY_HEIGHT - 70)
 
         if done:
             next_state = None
@@ -147,6 +152,7 @@ def test(M):
     with T.no_grad():
         while not done:
             state = T.cat([frame, prev_frame], dim=0)
+            state = state.to(M.device)
 
             eps = 0.1
             action, was_random = rl.epsilon_greedy(
@@ -157,9 +163,10 @@ def test(M):
 
             frame = transform(frame)
 
-            M.display.draw_pytorch_tensor(frame, 0, 0)
-            action_label = "[i] action: {}".format(M.action_db[action])
-            M.display.draw_text(action_label, 10, DISPLAY_HEIGHT - 30)
+            if DISPLAY_ENABLED:
+                M.display.draw_pytorch_tensor(frame, 0, 0)
+                action_label = "[i] action: {}".format(M.action_db[action])
+                M.display.draw_text(action_label, 10, DISPLAY_HEIGHT - 30)
 
             time.sleep(0.05)
 
@@ -175,7 +182,8 @@ def main(*args, **kwargs):
     M.target.to(M.device)
 
     M.memory = rl.ReplayMemory(10000)
-    M.display = Display("breakout", DISPLAY_WIDTH, DISPLAY_HEIGHT)
+    if DISPLAY_ENABLED:
+        M.display = Display("breakout", DISPLAY_WIDTH, DISPLAY_HEIGHT)
     M.action_db = {
         0: "NOP",
         1: "Fire",
