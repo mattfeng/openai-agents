@@ -129,8 +129,8 @@ def train(M):
         same = T.all(T.lt(
             T.abs(T.add(prev_frame, -frame)), 1e-8)).item()
         
-        if action == 0:
-            reward -= 5.0
+        if action != 0:
+            reward += 0.1
 
         if same == 0:
             consecutive_same = 0
