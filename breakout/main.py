@@ -129,13 +129,13 @@ def train(M):
         same = T.all(T.lt(
             T.abs(T.add(prev_frame, -frame)), 1e-8)).item()
         
+        if action == 0:
+            reward -= 5.0
 
         if same == 0:
             consecutive_same = 0
         else:
             consecutive_same += 1
-            if action == 0:
-                reward -= 5.0
 
         if consecutive_same > 40:
             done = True
@@ -265,6 +265,7 @@ def main(*args, **kwargs):
         M.log.write("epoch, {}, train_dur, {}, test_dur, {}\n".format(
             epoch, duration, test_duration
         ))
+        M.log.flush()
 
 
 if __name__ == "__main__":
