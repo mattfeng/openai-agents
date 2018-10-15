@@ -109,6 +109,7 @@ def train(M):
     for t in count():
         eps = EPS_END + (EPS_START - EPS_END) * \
             math.exp(-1. * M.steps / EPS_DECAY)
+        M.eps = eps
 
         state = state.to(M.device)
         action, was_random  = rl.epsilon_greedy(
@@ -211,8 +212,8 @@ def main(*args, **kwargs):
         M.epoch = epoch
         duration = train(M)
         durations.append(duration)
-        print("[train/{}] duration: {}, total steps: {}".format(
-            epoch, duration, M.steps))
+        print("[train/{}] duration: {}, total steps: {}, eps: {:0.2f}".format(
+            epoch, duration, M.steps, M.eps))
         test_duration = test(M)
         test_durations.append(test_duration)
         print("[test/{}] test_duration: {}".format(epoch, test_duration))
