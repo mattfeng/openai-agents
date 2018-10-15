@@ -50,6 +50,10 @@ def eval(M):
             eps = 0.0
             action, was_random = rl.epsilon_greedy(
                 M.env.action_space.n, state, M.policy, eps)
+                
+            if consecutive_same > 30:
+                print("[i] action overriden")
+                action = 1
 
             prev_frame = T.tensor(frame)
             frame, _, done, _ = env.step(action)
@@ -64,9 +68,6 @@ def eval(M):
             else:
                 consecutive_same += 1
 
-            if consecutive_same > 40:
-                done = True
-                t -= 40
 
             M.display.draw_pytorch_tensor(frame, 0, 0)
             action_label = "[i] action: {} (random? {})".format(
@@ -79,13 +80,13 @@ def eval(M):
 
 @bootstrap.main
 def main(*args, **kwargs):
-    model_file = "model-epoch-49-time-1539630865.pt"
+    model_file = "model-epoch-53-time-1539633205.pt"
     M = kwargs["M"]
     M.env = gym.make("Breakout-v4")
 
     M.policy = DQN()
-    M.policy.load_state_dict(
-        T.load("./models/{}".format(model_file), map_location=M.device))
+    # M.policy.load_state_dict(
+        # T.load("./models/{}".format(model_file), map_location=M.device))
 
     M.display = Display("breakout", DISPLAY_WIDTH, DISPLAY_HEIGHT)
 

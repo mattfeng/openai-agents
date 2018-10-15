@@ -15,7 +15,7 @@ class DQN(nn.Module):
         super(DQN, self).__init__()
         # input size (84, 84, 6)
         # Takes the current and previous frames
-        self.conv1 = nn.Conv2d(6, 32, kernel_size=3, stride=1)
+        self.conv1 = nn.Conv2d(6, 32, kernel_size=5, stride=2)
         self.bn1 = nn.BatchNorm2d(32) # num_features = # channels
         self.conv2 = nn.Conv2d(32, 64, kernel_size=5, stride=2)
         self.bn2 = nn.BatchNorm2d(64)

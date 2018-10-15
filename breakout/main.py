@@ -120,7 +120,7 @@ def train(M):
         state = state.to(M.device)
         action, was_random  = rl.epsilon_greedy(
             env.action_space.n, state, M.policy, eps)
-        
+
         prev_frame = T.tensor(frame)
         frame, reward, done, _ = env.step(action)
         frame = transform(frame)
@@ -133,10 +133,6 @@ def train(M):
             consecutive_same = 0
         else:
             consecutive_same += 1
-
-        if consecutive_same > 40:
-            done = True
-            duration -= 40
 
         if DISPLAY_ENABLED:
             M.display.draw_pytorch_tensor(frame, 0, 0)
@@ -189,6 +185,10 @@ def test(M):
             action, was_random = rl.epsilon_greedy(
                 M.env.action_space.n, state, M.policy, eps)
 
+            if consecutive_same > 30:
+                action = 1
+                print("[i] action overridden")
+
             prev_frame = T.tensor(frame)
             frame, _, done, _ = env.step(action)
             frame = transform(frame)
@@ -201,9 +201,6 @@ def test(M):
             else:
                 consecutive_same += 1
 
-            if consecutive_same > 40:
-                done = True
-                t -= 40
 
             action_label = "[i] action: {}".format(M.action_db[action])
             if DISPLAY_ENABLED:
