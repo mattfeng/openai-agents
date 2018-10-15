@@ -1,6 +1,10 @@
+from collections import namedtuple
 import torch as T
 import torch.nn as nn
 import torch.nn.functional as F
+
+Transition = namedtuple("Transition",
+    ("state", "action", "next_state", "reward"))
 
 class DQN(nn.Module):
     """
