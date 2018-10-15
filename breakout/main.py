@@ -84,7 +84,6 @@ def optimize_model(M):
         state_action_values,
         expected_state_action_values.unsqueeze(1))
     
-
     # Optimize the model
     M.optim().zero_grad()
     loss.backward()
@@ -110,6 +109,7 @@ def train(M):
     M.policy.train()
     consecutive_same = 0
     total_loss = 0
+    num_loss = 1
 
     for t in count():
         # Decrease the chance of random action as training progresses
@@ -154,7 +154,10 @@ def train(M):
         state = next_state
         M.steps += 1
 
-        total_loss += optimize_model(M)
+        loss = optimize_model(M)
+        if loss is not None:
+            total_loss += loss
+            num_loss += 1
 
         if done:
             duration += t + 1
@@ -164,7 +167,7 @@ def train(M):
     if M.epoch % TARGET_UPDATE == 0:
         M.target.load_state_dict(M.policy.state_dict())
     
-    return duration, total_loss / duration
+    return duration, total_loss / num_loss
 
 def test(M):
     print("[*] -- testing mode --")
