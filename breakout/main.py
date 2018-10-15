@@ -142,6 +142,9 @@ def train(M):
             M.display.draw_text(action_label, 10, DISPLAY_HEIGHT - 30)
             eps_label = "[i] eps: {:0.2f} (random? {})".format(eps, was_random)
             M.display.draw_text(eps_label, 10, DISPLAY_HEIGHT - 70)
+        else:
+            reward_label = "[i] reward: {}".format(reward.item())
+            print(reward_label)
 
         if done:
             next_state = None
