@@ -181,7 +181,7 @@ def test(M):
             state = T.cat([frame, prev_frame], dim=0)
             state = state.to(M.device)
 
-            eps = 0.1
+            eps = 0.0
             action, was_random = rl.epsilon_greedy(
                 M.env.action_space.n, state, M.policy, eps)
 
