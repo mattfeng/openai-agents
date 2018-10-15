@@ -110,7 +110,7 @@ def train(M):
     for t in count():
         # Decrease the chance of random action as training progresses
         eps = EPS_END + (EPS_START - EPS_END) * \
-            math.exp(-1. * (M.steps - 10000) / EPS_DECAY)
+            math.exp(-1. * (M.steps) / EPS_DECAY)
         M.eps = eps
 
         # Compute an action using the epsilon greedy procedure
