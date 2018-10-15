@@ -100,7 +100,7 @@ def train(M):
     duration = 0
     env = M.env
     prev_frame = transform(env.reset())
-    frame, _, _, _ = env.step(env.action_space.sample())
+    frame, _, _, _ = env.step(0)
     frame = transform(frame)
     state = T.cat([frame, prev_frame], dim=0)
     done = False
