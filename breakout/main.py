@@ -109,7 +109,8 @@ def train(M):
 
     for t in count():
         # Decrease the chance of random action as training progresses
-        eps = 0.9
+        eps = EPS_START
+        M.eps = eps
         if M.steps > 10000:
             eps = EPS_END + (EPS_START - EPS_END) * \
                 math.exp(-1. * (M.steps - 10000) / EPS_DECAY)
