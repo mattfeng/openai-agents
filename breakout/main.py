@@ -221,7 +221,7 @@ def main(*args, **kwargs):
     M.target.eval()
     M.policy.to(M.device)
     M.target.to(M.device)
-    M.log = open("log-{:.0f}.txt".format(time.time()))
+    M.log = open("log-{:.0f}.txt".format(time.time()), "a")
 
     M.memory = rl.ReplayMemory(10000)
     if DISPLAY_ENABLED:
