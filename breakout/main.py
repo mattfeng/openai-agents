@@ -90,7 +90,9 @@ def optimize_model(M):
     for param in M.policy.parameters():
         param.grad.data.clamp_(-1, 1)
     M.optim().step()
-    print("[x] finish optimizing: step {}".format(M.steps))
+
+    if M.steps % 20 == 0:
+        print("[x] finish optimizing: step {}".format(M.steps))
 
 def train(M):
     print("[*] -- training mode --")
