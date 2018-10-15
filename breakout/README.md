@@ -5,9 +5,12 @@
 The network consists of three convolutional layers and two feed-forward layers, with experience replay for stabilized training.
 One of the most novel features of the papers is the training method: using a cache of transitions in order to decouple action values with time.
 
+## Images
+<img src="./imgs/dashboard.png" alt="dashboard"/>
+<img src="./imgs/terminal.png" alt="terminal"/>
+
 ## Required dependencies
 * `torchutils`
-
 
 ## Running the model
 ```bash
