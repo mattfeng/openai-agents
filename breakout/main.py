@@ -109,9 +109,11 @@ def train(M):
 
     for t in count():
         # Decrease the chance of random action as training progresses
-        eps = EPS_END + (EPS_START - EPS_END) * \
-            math.exp(-1. * M.steps / EPS_DECAY)
-        M.eps = eps
+        eps = 0.9
+        if M.steps > 10000:
+            eps = EPS_END + (EPS_START - EPS_END) * \
+                math.exp(-1. * (M.steps - 10000) / EPS_DECAY)
+            M.eps = eps
 
         # Compute an action using the epsilon greedy procedure
         state = state.to(M.device)
