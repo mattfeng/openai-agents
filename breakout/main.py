@@ -216,7 +216,7 @@ def main(*args, **kwargs):
         test_duration = test(M)
         test_durations.append(test_duration)
         print("[test/{}] test_duration: {}".format(epoch, test_duration))
-        save_path = "models/model-epoch-{}-time-{}.pt".format(
+        save_path = "models/model-epoch-{}-time-{:.0f}.pt".format(
             epoch, time.time())
         T.save(M.policy.state_dict(), save_path)
 
