@@ -218,7 +218,7 @@ def main(*args, **kwargs):
         print("[test/{}] test_duration: {}".format(epoch, test_duration))
         save_path = "models/model-epoch-{}-time-{}.pt".format(
             epoch, time.time())
-        T.save(M.policy.state_dict(), PATdH)
+        T.save(M.policy.state_dict(), save_path)
 
 
 if __name__ == "__main__":
