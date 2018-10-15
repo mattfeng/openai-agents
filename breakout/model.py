@@ -21,7 +21,7 @@ class DQN(nn.Module):
         self.bn2 = nn.BatchNorm2d(32)
         self.conv3 = nn.Conv2d(32, 10, kernel_size=1)
         self.bn3 = nn.BatchNorm2d(10)
-        self.fc1 = nn.Linear(3240, 300)
+        self.fc1 = nn.Linear(640, 300)
         self.fc2 = nn.Linear(300, 4)
 
     def forward(self, x):
@@ -34,7 +34,7 @@ class DQN(nn.Module):
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
-        x = F.relu(self.fc1(x.view(-1, 3240)))
+        x = F.relu(self.fc1(x.view(-1, 640)))
         x = F.relu(self.fc2(x))
 
         return x
