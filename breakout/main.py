@@ -119,8 +119,7 @@ def train(M):
         # Compute an action using the epsilon greedy procedure
         state = state.to(M.device)
         action, was_random  = rl.epsilon_greedy(
-            env.action_space.n - 1, state, M.policy, eps)
-        action += 1
+            env.action_space.n, state, M.policy, eps)
         
         prev_frame = T.tensor(frame)
         frame, reward, done, _ = env.step(action)
@@ -188,8 +187,7 @@ def test(M):
 
             eps = 0.0
             action, was_random = rl.epsilon_greedy(
-                M.env.action_space.n - 1, state, M.policy, eps)
-            action += 1
+                M.env.action_space.n, state, M.policy, eps)
 
             prev_frame = T.tensor(frame)
             frame, _, done, _ = env.step(action)
@@ -240,7 +238,7 @@ def main(*args, **kwargs):
         3: "Left"
     }
 
-    M.optim(optim.RMSprop(M.policy.parameters()))
+    M.optim(optim.RMSprop(M.policy.parameters(), lr=1e-4, alpha=0.999))
     M.steps = 0
 
     durations = []
