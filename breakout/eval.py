@@ -80,13 +80,13 @@ def eval(M):
 
 @bootstrap.main
 def main(*args, **kwargs):
-    model_file = "model-epoch-53-time-1539633205.pt"
+    model_file = "model-epoch-45-time-1539637626.pt"
     M = kwargs["M"]
     M.env = gym.make("Breakout-v4")
 
     M.policy = DQN()
-    # M.policy.load_state_dict(
-        # T.load("./models/{}".format(model_file), map_location=M.device))
+    M.policy.load_state_dict(
+        T.load("./models/{}".format(model_file), map_location=M.device))
 
     M.display = Display("breakout", DISPLAY_WIDTH, DISPLAY_HEIGHT)
 
@@ -97,7 +97,8 @@ def main(*args, **kwargs):
         3: "Left"
     }
 
-    eval(M)
+    duration = eval(M)
+    print("[i] duration: {}".format(duration))
 
 if __name__ == "__main__":
     main()
