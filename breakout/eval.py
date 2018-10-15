@@ -80,7 +80,7 @@ def eval(M):
 
 @bootstrap.main
 def main(*args, **kwargs):
-    model_file = "model-epoch-45-time-1539637626.pt"
+    model_file = "model-epoch-106-time-1539647186.pt"
     M = kwargs["M"]
     M.env = gym.make("Breakout-v4")
 
