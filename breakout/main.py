@@ -144,7 +144,6 @@ def train(M):
             M.display.draw_text(eps_label, 10, DISPLAY_HEIGHT - 70)
         else:
             reward_label = "[i] reward: {}".format(reward.item())
-            print(reward_label)
 
         if done:
             next_state = None
@@ -156,7 +155,8 @@ def train(M):
         state = next_state
         M.steps += 1
 
-        optimize_model(M)
+        if M.steps > 10000:
+            optimize_model(M)
 
         if done:
             duration = t + 1
