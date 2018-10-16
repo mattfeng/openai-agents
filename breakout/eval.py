@@ -46,14 +46,14 @@ def eval(M):
             state = T.cat([frame, prev_frame], dim=0)
             state = state.to(M.device)
 
-
             eps = 0.0
-            action, was_random = rl.epsilon_greedy(
+            action, was_random, _ = rl.epsilon_greedy(
                 M.env.action_space.n, state, M.policy, eps)
                 
             if consecutive_same > 30:
                 print("[i] action overriden")
                 action = 1
+                consecutive_same = 0
 
             prev_frame = T.tensor(frame)
             frame, _, done, _ = env.step(action)
@@ -61,7 +61,7 @@ def eval(M):
             frame = transform(frame)
 
             same = T.all(T.lt(
-                T.abs(T.add(prev_frame, -frame)), 1e-8)).item()
+                T.abs(T.add(prev_frame[:-10, :], -frame[:-10, ])), 1e-8)).item()
 
             if same == 0:
                 consecutive_same = 0
@@ -80,7 +80,7 @@ def eval(M):
 
 @bootstrap.main
 def main(*args, **kwargs):
-    model_file = "model-epoch-106-time-1539647186.pt"
+    model_file = "model-epoch-170-time-1539656585.pt"
     M = kwargs["M"]
     M.env = gym.make("Breakout-v4")
 

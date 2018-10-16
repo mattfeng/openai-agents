@@ -127,14 +127,6 @@ def train(M):
         frame = transform(frame)
         reward = T.tensor([float(np.sign(int(reward)))], device=M.device)
 
-        same = T.all(T.lt(
-            T.abs(T.add(prev_frame, -frame)), 1e-8)).item()
-
-        if same == 0:
-            consecutive_same = 0
-        else:
-            consecutive_same += 1
-
         if DISPLAY_ENABLED:
             M.display.draw_pytorch_tensor(frame, 0, 0)
             action_label = "[i] action: {}".format(M.action_db[action])
@@ -192,15 +184,16 @@ def test(M):
                 print("action values: {}".format(action_values))
 
             if consecutive_same > 30:
-                action = 1
                 print("[i] action overridden")
+                action = 1
+                consecutive_same = 0
 
             prev_frame = T.tensor(frame)
             frame, _, done, _ = env.step(action)
             frame = transform(frame)
 
             same = T.all(T.lt(
-                T.abs(T.add(prev_frame, -frame)), 1e-8)).item()
+                T.abs(T.add(prev_frame[:-10, :], -frame[:-10, :])), 1e-8)).item()
 
             if same == 0:
                 consecutive_same = 0
