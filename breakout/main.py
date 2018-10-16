@@ -28,10 +28,10 @@ DISPLAY_WIDTH = 600
 DISPLAY_HEIGHT = 600
 
 EPOCHS = 10000
-BATCH_SIZE = 32
+BATCH_SIZE = 128
 GAMMA = 0.99
-EPS_START = 0.75
-EPS_END = 0.05
+EPS_START = 0.9
+EPS_END = 0.1
 EPS_DECAY = 2e5
 TARGET_UPDATE = 10
 
@@ -232,7 +232,7 @@ def main(*args, **kwargs):
     M.model_folder = "./model-{}".format(M.time)
     os.mkdir(M.model_folder)
 
-    M.memory = rl.ReplayMemory(50000)
+    M.memory = rl.ReplayMemory(10000)
     if DISPLAY_ENABLED:
         M.display = Display("breakout", DISPLAY_WIDTH, DISPLAY_HEIGHT)
     M.action_db = {
