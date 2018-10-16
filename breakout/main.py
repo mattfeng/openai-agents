@@ -30,7 +30,7 @@ DISPLAY_HEIGHT = 600
 EPOCHS = 10000
 BATCH_SIZE = 32
 GAMMA = 0.99
-EPS_START = 1.0
+EPS_START = 0.75
 EPS_END = 0.05
 EPS_DECAY = 2e5
 TARGET_UPDATE = 10
@@ -220,6 +220,10 @@ def main(*args, **kwargs):
     M.target.eval()
     M.policy.to(M.device)
     M.target.to(M.device)
+
+    starter = "./model-1539663650/model-epoch-1575.pt"
+    M.policy.load_state_dict(
+        T.load(starter, map_location=M.device))
     M.time = int(time.time())
     M.log = open("log-{}.txt".format(M.time), "a")
     M.model_folder = "./model-{}".format(M.time)
