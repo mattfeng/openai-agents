@@ -79,6 +79,7 @@ def optimize_model(M):
 
     # Compute the expected Q values
     expected_state_action_values = reward_batch + (GAMMA * next_state_values)
+    print(expected_state_action_values[:10])
 
     loss = F.smooth_l1_loss(
         state_action_values,
