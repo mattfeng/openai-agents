@@ -28,11 +28,11 @@ DISPLAY_WIDTH = 600
 DISPLAY_HEIGHT = 600
 
 EPOCHS = 10000
-BATCH_SIZE = 128
+BATCH_SIZE = 32
 GAMMA = 0.99
-EPS_START = 0.9
-EPS_END = 0.1
-EPS_DECAY = 2e5
+EPS_START = 0.3
+EPS_END = 0.2
+EPS_DECAY = 2e4
 TARGET_UPDATE = 10
 
 transform = V.Compose([
@@ -221,8 +221,8 @@ def main(*args, **kwargs):
     M.policy.to(M.device)
     M.target.to(M.device)
 
-    starter = "./model-1539663650/model-epoch-1575.pt"
-    starter_target = "./model-1539663650/model-epoch-1600.pt"
+    starter = "./model-1539663650/model-epoch-1450.pt"
+    starter_target = "./model-1539663650/model-epoch-1451.pt"
     M.policy.load_state_dict(
         T.load(starter, map_location=M.device))
     M.target.load_state_dict(
@@ -256,7 +256,8 @@ def main(*args, **kwargs):
             epoch, duration, M.steps, avg_loss, M.eps))
         test_duration = test(M)
         test_durations.append(test_duration)
-        print("[test/{}] test_duration: {}".format(epoch, test_duration))
+        print("[model-{}][test/{}] test_duration: {}".format(
+            M.time, epoch, test_duration))
 
         # Save model
         save_path = "./{}/model-epoch-{}.pt".format(
@@ -264,8 +265,8 @@ def main(*args, **kwargs):
         T.save(M.policy.state_dict(), save_path)
 
         # Log training progress
-        M.log.write("epoch, {}, train_dur, {}, test_dur, {}\n".format(
-            epoch, duration, test_duration
+        M.log.write("epoch, {}, train_dur, {}, test_dur, {}, avg loss, {}\n".format(
+            epoch, duration, test_duration, avg_loss
         ))
         M.log.flush()
 
