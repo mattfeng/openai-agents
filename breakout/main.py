@@ -32,7 +32,7 @@ BATCH_SIZE = 32
 GAMMA = 0.99
 EPS_START = 1.0
 EPS_END = 0.05
-EPS_DECAY = 1e6
+EPS_DECAY = 2e5
 TARGET_UPDATE = 10
 
 transform = V.Compose([
