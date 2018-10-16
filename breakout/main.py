@@ -188,6 +188,9 @@ def test(M):
             action, was_random, action_values = rl.epsilon_greedy(
                 M.env.action_space.n, state, M.policy, eps)
 
+            if t % 50 == 0:
+                print("action values: {}".format(action_values))
+
             if consecutive_same > 30:
                 action = 1
                 print("[i] action overridden")
