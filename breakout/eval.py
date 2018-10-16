@@ -80,7 +80,11 @@ def eval(M):
 
 @bootstrap.main
 def main(*args, **kwargs):
-    model_file = "model-epoch-170-time-1539656585.pt"
+    if len(sys.argv) < 2:
+        print("Usage: ./eval.py <epoch>")
+        quit()
+
+    model_file = "model-epoch-{}.pt".format(sys.argv[1])
     M = kwargs["M"]
     M.env = gym.make("Breakout-v4")
 
