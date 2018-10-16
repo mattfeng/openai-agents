@@ -220,7 +220,10 @@ def main(*args, **kwargs):
     M.target.eval()
     M.policy.to(M.device)
     M.target.to(M.device)
-    M.log = open("log-{:.0f}.txt".format(time.time()), "a")
+    M.time = int(time.time())
+    M.log = open("log-{}.txt".format(M.time), "a")
+    M.model_folder = "./model-{}".format(M.time)
+    os.mkdir(M.model_folder)
 
     M.memory = rl.ReplayMemory(10000)
     if DISPLAY_ENABLED:
@@ -237,6 +240,7 @@ def main(*args, **kwargs):
 
     durations = []
     test_durations = []
+
     for epoch in range(EPOCHS):
         M.epoch = epoch
         duration, avg_loss = train(M)
@@ -248,8 +252,8 @@ def main(*args, **kwargs):
         print("[test/{}] test_duration: {}".format(epoch, test_duration))
 
         # Save model
-        save_path = "models/model-epoch-{}-time-{:.0f}.pt".format(
-            epoch, time.time())
+        save_path = "./{}/model-epoch-{}.pt".format(
+            M.model_folder, epoch)
         T.save(M.policy.state_dict(), save_path)
 
         # Log training progress
