@@ -29,7 +29,7 @@ DISPLAY_HEIGHT = 600
 
 EPOCHS = 10000
 BATCH_SIZE = 32
-GAMMA = 0.999
+GAMMA = 0.99
 EPS_START = 0.99
 EPS_END = 0.05
 EPS_DECAY = 1e5
@@ -70,7 +70,7 @@ def optimize_model(M):
     #   transitioning to -- in other words, what is the
     #   predicted value of our action, given our state)?
     state_action_values = M.policy(state_batch).gather(1, action_batch.view(-1, 1))
-    print("state_action_values", state_action_values[:10])
+    print("state_action_values", T.sum(state_action_values))
 
     # - compute the "actual" value of the next state
     #   we ended up in by taking the above action.
