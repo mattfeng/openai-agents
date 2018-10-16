@@ -28,9 +28,9 @@ class DQN(nn.Module):
         x :
         """
         x = x.view(-1, 6, 84, 84)
-        x = F.relu(self.bn1(self.conv1(x)))
-        x = F.relu(self.bn2(self.conv2(x)))
-        x = F.relu(self.bn3(self.conv3(x)))
+        x = F.relu(self.conv1(x))
+        x = F.relu(self.conv2(x))
+        x = F.relu(self.conv3(x))
         x = F.relu(self.fc1(x.view(-1, 7 * 7 * 64)))
         x = F.relu(self.fc2(x))
 
