@@ -121,8 +121,11 @@ def train(M):
 
         # Compute an action using the epsilon greedy procedure
         state = state.to(M.device)
-        action, was_random  = rl.epsilon_greedy(
+        action, was_random, action_values  = rl.epsilon_greedy(
             env.action_space.n, state, M.policy, eps)
+        
+        if t % 50:
+            print("[train] action values: {}".format(action_values))
 
         prev_frame = T.tensor(frame)
         frame, reward, done, _ = env.step(action)
@@ -187,8 +190,11 @@ def test(M):
             state = state.to(M.device)
 
             eps = 0.0
-            action, was_random = rl.epsilon_greedy(
+            action, was_random, action_values = rl.epsilon_greedy(
                 M.env.action_space.n, state, M.policy, eps)
+
+            if t % 50:
+                print("[test] action values: {}".format(action_values))
 
             if consecutive_same > 30:
                 action = 1
