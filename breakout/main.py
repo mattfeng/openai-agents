@@ -222,14 +222,17 @@ def main(*args, **kwargs):
     M.target.to(M.device)
 
     starter = "./model-1539663650/model-epoch-1575.pt"
+    starter_target = "./model-1539663650/model-epoch-1600.pt"
     M.policy.load_state_dict(
         T.load(starter, map_location=M.device))
+    M.target.load_state_dict(
+        T.load(starter_target, map_location=M.device))
     M.time = int(time.time())
     M.log = open("log-{}.txt".format(M.time), "a")
     M.model_folder = "./model-{}".format(M.time)
     os.mkdir(M.model_folder)
 
-    M.memory = rl.ReplayMemory(10000)
+    M.memory = rl.ReplayMemory(50000)
     if DISPLAY_ENABLED:
         M.display = Display("breakout", DISPLAY_WIDTH, DISPLAY_HEIGHT)
     M.action_db = {
