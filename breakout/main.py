@@ -57,8 +57,6 @@ def optimize_model(M):
     state_batch = T.cat(batch.state)
     action_batch = T.cat(batch.action)
     reward_batch = T.cat(batch.reward)
-    print("nonfinalmask", non_final_mask[:10])
-    print("action_batch", action_batch[:10])
 
     non_final_next_states = non_final_next_states.to(M.device)
     state_batch = state_batch.to(M.device)
@@ -72,6 +70,7 @@ def optimize_model(M):
     #   transitioning to -- in other words, what is the
     #   predicted value of our action, given our state)?
     state_action_values = M.policy(state_batch).gather(1, action_batch.view(-1, 1))
+    print("state_action_values", state_action_values[:10])
 
     # - compute the "actual" value of the next state
     #   we ended up in by taking the above action.
