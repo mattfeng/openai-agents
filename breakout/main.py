@@ -124,7 +124,7 @@ def train(M):
         action, was_random, action_values  = rl.epsilon_greedy(
             env.action_space.n, state, M.policy, eps)
         
-        if t % 50:
+        if t % 50 == 0:
             print("[train] action values: {}".format(action_values))
 
         prev_frame = T.tensor(frame)
@@ -193,7 +193,7 @@ def test(M):
             action, was_random, action_values = rl.epsilon_greedy(
                 M.env.action_space.n, state, M.policy, eps)
 
-            if t % 50:
+            if t % 50 == 0:
                 print("[test] action values: {}".format(action_values))
 
             if consecutive_same > 30:
