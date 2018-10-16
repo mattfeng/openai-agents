@@ -221,8 +221,10 @@ def main(*args, **kwargs):
     M.policy.to(M.device)
     M.target.to(M.device)
 
-    starter = "./model-1539663650/model-epoch-1450.pt"
-    starter_target = "./model-1539663650/model-epoch-1451.pt"
+    # starter = "./model-1539663650/model-epoch-1450.pt"
+    # starter_target = "./model-1539663650/model-epoch-1451.pt"
+    starter = "./model-1539692640/model-epoch-134.pt"
+    starter_target = "./model-1539692640/model-epoch-134.pt"
     M.policy.load_state_dict(
         T.load(starter, map_location=M.device))
     M.target.load_state_dict(
