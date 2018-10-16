@@ -70,7 +70,7 @@ def optimize_model(M):
     #   transitioning to -- in other words, what is the
     #   predicted value of our action, given our state)?
     state_action_values = M.policy(state_batch).gather(1, action_batch.view(-1, 1))
-    print("state_action_values", T.sum(state_action_values))
+    print("state_action_values", T.sum(state_action_values).detach())
 
     # - compute the "actual" value of the next state
     #   we ended up in by taking the above action.
