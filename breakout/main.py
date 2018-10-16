@@ -223,14 +223,14 @@ def main(*args, **kwargs):
 
     # starter = "./model-1539663650/model-epoch-1450.pt"
     # starter_target = "./model-1539663650/model-epoch-1451.pt"
-    starter = "./model-1539692640/model-epoch-134.pt"
-    starter_target = "./model-1539692640/model-epoch-134.pt"
+    starter = "./baseline/model-epoch-853.pt"
+    starter_target = "./baseline/model-epoch-853.pt"
     M.policy.load_state_dict(
         T.load(starter, map_location=M.device))
     M.target.load_state_dict(
         T.load(starter_target, map_location=M.device))
     M.time = int(time.time())
-    M.log = open("log-{}.txt".format(M.time), "a")
+    M.log = open("./logs/log-{}.txt".format(M.time), "a")
     M.model_folder = "./model-{}".format(M.time)
     os.mkdir(M.model_folder)
 
