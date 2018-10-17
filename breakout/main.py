@@ -107,7 +107,6 @@ def train(M):
     state = T.cat([frame, prev_frame], dim=0)
     done = False
     M.policy.train()
-    consecutive_same = 0
     total_loss = 0
     num_loss = 1
 
