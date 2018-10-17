@@ -244,7 +244,7 @@ def main(*args, **kwargs):
         3: "Left"
     }
 
-    M.optim(optim.RMSprop(M.policy.parameters(), lr=0.00025))
+    M.optim(optim.RMSprop(M.policy.parameters(), lr=0.008))
     M.steps = 0
 
     durations = []
