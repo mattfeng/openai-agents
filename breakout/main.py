@@ -35,6 +35,8 @@ EPS_END = 0.05
 EPS_DECAY = 5e4
 TARGET_UPDATE = 10
 LEARNING_RATE = 0.00005
+STEPS_BEFORE_TRAIN = 20000
+REPLAY_BUF_SIZE = 20000
 
 transform = V.Compose([
     V.ToPILImage(),
@@ -44,6 +46,9 @@ transform = V.Compose([
 ])
 
 def optimize_model(M):
+    if M.steps < STEPS_BEFORE_TRAIN:
+        return
+
     if len(M.memory) < BATCH_SIZE:
         return
 
@@ -115,7 +120,7 @@ def train(M):
     for t in count():
         # Decrease the chance of random action as training progresses
         eps = EPS_END + (EPS_START - EPS_END) * \
-            math.exp(-1. * (M.steps) / EPS_DECAY)
+            math.exp(-1. * (M.steps - STEPS_BEFORE_TRAIN) / EPS_DECAY)
         M.eps = eps
 
         # Compute an action using the epsilon greedy procedure
@@ -234,7 +239,7 @@ def main(*args, **kwargs):
     M.model_folder = "./model-{}".format(M.time)
     os.mkdir(M.model_folder)
 
-    M.memory = rl.ReplayMemory(10000)
+    M.memory = rl.ReplayMemory(REPLAY_BUF_SIZE)
     if DISPLAY_ENABLED:
         M.display = Display("breakout", DISPLAY_WIDTH, DISPLAY_HEIGHT)
     M.action_db = {
