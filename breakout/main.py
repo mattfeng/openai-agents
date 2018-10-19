@@ -37,6 +37,7 @@ TARGET_UPDATE = 10
 
 transform = V.Compose([
     V.ToPILImage(),
+    V.Grayscale(1),
     V.Resize((84, 84)),
     V.ToTensor()
 ])
@@ -212,7 +213,7 @@ def test(M):
 @bootstrap.main
 def main(*args, **kwargs):
     M = kwargs["M"]
-    M.env = gym.make("Breakout-v4")
+    M.env = gym.make("BreakoutDeterministic-v4")
 
     M.policy = DQN()
     M.target = DQN()
@@ -222,12 +223,12 @@ def main(*args, **kwargs):
 
     # starter = "./model-1539663650/model-epoch-1450.pt"
     # starter_target = "./model-1539663650/model-epoch-1451.pt"
-    starter = "./baseline/model-epoch-853.pt"
-    starter_target = "./baseline/model-epoch-853.pt"
-    M.policy.load_state_dict(
-        T.load(starter, map_location=M.device))
-    M.target.load_state_dict(
-        T.load(starter_target, map_location=M.device))
+    # starter = "./baseline/model-epoch-853.pt"
+    # starter_target = "./baseline/model-epoch-853.pt"
+    # M.policy.load_state_dict(
+    #     T.load(starter, map_location=M.device))
+    # M.target.load_state_dict(
+    #     T.load(starter_target, map_location=M.device))
     M.time = int(time.time())
     M.log = open("./logs/log-{}.txt".format(M.time), "a")
     M.model_folder = "./model-{}".format(M.time)

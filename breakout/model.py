@@ -13,9 +13,9 @@ class DQN(nn.Module):
 
     def __init__(self):
         super(DQN, self).__init__()
-        # input size (84, 84, 6)
+        # input size (84, 84, 2)
         # Takes the current and previous frames
-        self.conv1 = nn.Conv2d(6, 32, kernel_size=8, stride=4)
+        self.conv1 = nn.Conv2d(2, 32, kernel_size=8, stride=4)
         self.conv2 = nn.Conv2d(32, 64, kernel_size=4, stride=2)
         self.conv3 = nn.Conv2d(64, 64, kernel_size=3, stride=1)
         self.fc1 = nn.Linear(7 * 7 * 64, 512)
