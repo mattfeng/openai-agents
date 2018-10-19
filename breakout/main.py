@@ -201,7 +201,6 @@ def test(M):
             else:
                 consecutive_same += 1
 
-
             action_label = "[i] action: {}".format(M.action_db[action])
             if DISPLAY_ENABLED:
                 M.display.draw_pytorch_tensor(frame, 0, 0)
