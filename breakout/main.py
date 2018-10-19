@@ -27,13 +27,14 @@ DISPLAY_ENABLED = os.environ['DISP'] == 'Y'
 DISPLAY_WIDTH = 600
 DISPLAY_HEIGHT = 600
 
-EPOCHS = 10000
+EPOCHS = 1000
 BATCH_SIZE = 32
 GAMMA = 0.99
-EPS_START = 0.3
-EPS_END = 0.2
-EPS_DECAY = 2e4
+EPS_START = 1.0
+EPS_END = 0.05
+EPS_DECAY = 5e4
 TARGET_UPDATE = 10
+LEARNING_RATE = 0.00005
 
 transform = V.Compose([
     V.ToPILImage(),
@@ -244,7 +245,7 @@ def main(*args, **kwargs):
         3: "Left"
     }
 
-    M.optim(optim.RMSprop(M.policy.parameters(), lr=0.008))
+    M.optim(optim.RMSprop(M.policy.parameters(), lr=LEARNING_RATE))
     M.steps = 0
 
     durations = []
