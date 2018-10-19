@@ -261,21 +261,23 @@ def main(*args, **kwargs):
         durations.append(duration)
         print("[train/{}] duration: {}, total steps: {}, avg loss: {:0.6f}, eps: {:0.2f}".format(
             epoch, duration, M.steps, avg_loss, M.eps))
-        test_duration = test(M)
-        test_durations.append(test_duration)
-        print("[model-{}][test/{}] test_duration: {}".format(
-            M.time, epoch, test_duration))
+        
+        if M.steps >= STEPS_BEFORE_TRAIN:
+            test_duration = test(M)
+            test_durations.append(test_duration)
+            print("[model-{}][test/{}] test_duration: {}".format(
+                M.time, epoch, test_duration))
 
-        # Save model
-        save_path = "./{}/model-epoch-{}.pt".format(
-            M.model_folder, epoch)
-        T.save(M.policy.state_dict(), save_path)
+            # Save model
+            save_path = "./{}/model-epoch-{}.pt".format(
+                M.model_folder, epoch)
+            T.save(M.policy.state_dict(), save_path)
 
-        # Log training progress
-        M.log.write("epoch, {}, train_dur, {}, test_dur, {}, avg loss, {}\n".format(
-            epoch, duration, test_duration, avg_loss
-        ))
-        M.log.flush()
+            # Log training progress
+            M.log.write("epoch, {}, train_dur, {}, test_dur, {}, avg loss, {}\n".format(
+                epoch, duration, test_duration, avg_loss
+            ))
+            M.log.flush()
 
 
 if __name__ == "__main__":
