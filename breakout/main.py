@@ -30,12 +30,12 @@ DISPLAY_HEIGHT = 600
 EPOCHS = 10000
 BATCH_SIZE = 32
 GAMMA = 0.99
-EPS_START = 1.0
+EPS_START = 0.7
 EPS_END = 0.05
 EPS_DECAY = 5e5
 TARGET_UPDATE = 4
 LEARNING_RATE = 0.00005
-STEPS_BEFORE_TRAIN = 2500
+STEPS_BEFORE_TRAIN = 0
 REPLAY_BUF_SIZE = 20000
 
 transform = V.Compose([
@@ -226,14 +226,12 @@ def main(*args, **kwargs):
     M.policy.to(M.device)
     M.target.to(M.device)
 
-    # starter = "./model-1539663650/model-epoch-1450.pt"
-    # starter_target = "./model-1539663650/model-epoch-1451.pt"
-    # starter = "./baseline/model-epoch-853.pt"
-    # starter_target = "./baseline/model-epoch-853.pt"
-    # M.policy.load_state_dict(
-    #     T.load(starter, map_location=M.device))
-    # M.target.load_state_dict(
-    #     T.load(starter_target, map_location=M.device))
+    starter = "./bootstrap/model-epoch-7500.pt"
+    starter_target = "./bootstrap/model-epoch-7550.pt"
+    M.policy.load_state_dict(
+        T.load(starter, map_location=M.device))
+    M.target.load_state_dict(
+        T.load(starter_target, map_location=M.device))
     M.time = int(time.time())
     M.log = open("./logs/log-{}.txt".format(M.time), "a")
     M.model_folder = "./model-{}".format(M.time)
