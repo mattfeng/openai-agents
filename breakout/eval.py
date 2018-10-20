@@ -25,8 +25,15 @@ from model import DQN, Transition
 DISPLAY_WIDTH = 600
 DISPLAY_HEIGHT = 600
 
+disp_transform = V.Compose([
+    V.ToPILImage(),
+    V.Resize((84, 84)),
+    V.ToTensor()
+])
+
 transform = V.Compose([
     V.ToPILImage(),
+    V.Grayscale(),
     V.Resize((84, 84)),
     V.ToTensor()
 ])
@@ -58,6 +65,8 @@ def eval(M):
             prev_frame = T.tensor(frame)
             frame, _, done, _ = env.step(action)
 
+            M.display.draw_pytorch_tensor(disp_transform(frame), 0, 0)
+
             frame = transform(frame)
 
             same = T.all(T.lt(
@@ -69,7 +78,6 @@ def eval(M):
                 consecutive_same += 1
 
 
-            M.display.draw_pytorch_tensor(frame, 0, 0)
             action_label = "[i] action: {} (random? {})".format(
                 M.action_db[action], was_random)
             M.display.draw_text(action_label, 10, DISPLAY_HEIGHT - 30)
