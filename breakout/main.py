@@ -30,11 +30,11 @@ DISPLAY_HEIGHT = 600
 EPOCHS = 10000
 BATCH_SIZE = 32
 GAMMA = 0.99
-EPS_START = 0.05
+EPS_START = 0.4
 EPS_END = 0.05
 EPS_DECAY = 5e5
 TARGET_UPDATE = 4
-LEARNING_RATE = 0.00005
+LEARNING_RATE = 0.000075
 STEPS_BEFORE_TRAIN = 0
 REPLAY_BUF_SIZE = 20000
 
@@ -226,8 +226,8 @@ def main(*args, **kwargs):
     M.policy.to(M.device)
     M.target.to(M.device)
 
-    starter = "./bootstrap/model-epoch-7500.pt"
-    starter_target = "./bootstrap/model-epoch-7550.pt"
+    starter = "./bootstrap/model-epoch-2750.pt"
+    starter_target = "./bootstrap/model-epoch-2750.pt"
     M.policy.load_state_dict(
         T.load(starter, map_location=M.device))
     M.target.load_state_dict(
