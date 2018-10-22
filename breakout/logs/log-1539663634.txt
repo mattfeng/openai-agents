@@ -1,4 +1,0 @@
-epoch, 0, train_dur, 163, test_dur, 249
-epoch, 1, train_dur, 192, test_dur, 251
-epoch, 2, train_dur, 183, test_dur, 311
-epoch, 3, train_dur, 173, test_dur, 250

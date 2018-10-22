@@ -1,1 +1,0 @@
-epoch, 0, train_dur, 339, test_dur, 408, avg loss, 0.00030542706372216344
