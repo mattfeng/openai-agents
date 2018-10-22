@@ -92,7 +92,7 @@ def main(*args, **kwargs):
         print("Usage: ./eval.py <epoch>")
         quit()
 
-    model_file = "model-epoch-{}.pt".format(sys.argv[1])
+    model_file = "model-1540092451/model-epoch-{}.pt".format(sys.argv[1])
     M = kwargs["M"]
     M.env = gym.make("Breakout-v4")
 
