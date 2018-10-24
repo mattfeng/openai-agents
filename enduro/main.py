@@ -63,6 +63,7 @@ def test(M):
     frame = transform(frame)
 
     done = False
+    cum_reward = 0
 
     with T.no_grad():
 
@@ -78,7 +79,8 @@ def test(M):
                 print("action values: {}".format(action_values))
 
             prev_frame = T.tensor(frame)
-            frame, _, done, _ = env.step(action)
+            frame, reward, done, _ = env.step(action)
+            cum_reward += reward
             frame = transform(frame)
 
             action_label = "[i] action: {}".format(M.action_db[action])
@@ -87,7 +89,7 @@ def test(M):
                 M.display.draw_text(action_label, 10, DISPLAY_HEIGHT - 30)
             
             if done:
-                return duration
+                return cum_reward, duration
 
 def train(M):
     M.log("begin TRAINING mode")
@@ -108,6 +110,7 @@ def train(M):
     total_loss = 0
     num_loss = 1
     done = False
+    cum_reward = 0
 
     for duration in count(1):
         # Decrease the chance of random action as training progresses
@@ -122,6 +125,8 @@ def train(M):
         
         prev_frame = T.tensor(frame)
         frame, reward, done, _ = env.step(action)
+        cum_reward += reward
+
         disp_frame = disp_transform(frame)
         frame = transform(frame)
         reward = T.tensor([float(np.sign(int(reward)))], device=M.device)
@@ -132,7 +137,9 @@ def train(M):
             action_label = "[i] action: {}".format(M.action_db[action])
             M.display.draw_text(action_label, 10, DISPLAY_HEIGHT - 30)
             eps_label = "[i] eps: {:0.2f} (random? {})".format(eps, was_random)
-            M.display.draw_text(eps_label, 10, DISPLAY_HEIGHT - 70)
+            M.display.draw_text(eps_label, 10, DISPLAY_HEIGHT - 60)
+            reward_label = "[i] reward: {:0.2f} (cum: {:0.2f})".format(reward.item(), cum_reward)
+            M.display.draw_text(reward_label, 10, DISPLAY_HEIGHT - 90)
         else:
             reward_label = "[i] reward: {}".format(reward.item())
 
@@ -161,7 +168,7 @@ def train(M):
     if M.epoch % TARGET_UPDATE == 0:
         M.target.load_state_dict(M.policy.state_dict())
     
-    return duration, total_loss / num_loss
+    return reward, duration, total_loss / num_loss
 
 
 def optimize(M):
@@ -229,7 +236,7 @@ def main(*args, **kwargs):
 
     M.action_db = {
         0: "NOP",
-        1: "Fire",
+        1: "Fire", # Speed up
         2: "Right",
         3: "Left",
         4: "Down",
@@ -258,11 +265,16 @@ def main(*args, **kwargs):
     M.steps = 0
     M.optim(optim.RMSprop(M.policy.parameters(), lr=LEARNING_RATE))
 
-    train(M)
-    test(M)
 
     for M.epoch in range(EPOCHS):
-        pass
+        reward, duration, avg_loss = train(M)
+        M.log("[train/{}] reward={:.0f} duration={:.0f} {:0.6f}".format(
+            M.epoch, reward, duration, avg_loss
+        ))
+        reward, duration = test(M)
+        M.data("[test/{}] reward={:.0f} duration={:.0f} {:0.6f}".format(
+            M.epoch, reward, duration
+        ))
 
 if __name__ == "__main__":
     main()
