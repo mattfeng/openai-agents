@@ -268,11 +268,11 @@ def main(*args, **kwargs):
 
     for M.epoch in range(EPOCHS):
         reward, duration, avg_loss = train(M)
-        M.log("[train/{}] reward={:.0f} duration={:.0f} {:0.6f}".format(
+        M.log("[train/{}] reward={:.0f} duration={:.0f} avg_loss={:0.6f}".format(
             M.epoch, reward, duration, avg_loss
         ))
         reward, duration = test(M)
-        M.data("[test/{}] reward={:.0f} duration={:.0f} {:0.6f}".format(
+        M.data("[test/{}] reward={:.0f} duration={:.0f}".format(
             M.epoch, reward, duration
         ))
 
