@@ -168,7 +168,7 @@ def train(M):
     if M.epoch % TARGET_UPDATE == 0:
         M.target.load_state_dict(M.policy.state_dict())
     
-    return reward, duration, total_loss / num_loss
+    return cum_reward, duration, total_loss / num_loss
 
 
 def optimize(M):
