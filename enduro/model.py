@@ -32,6 +32,9 @@ class DuelingDQN(nn.Module):
         val = F.relu(self.val_fc1(x))
         val = F.relu(self.val_fc2(val)).expand(-1, self.num_moves)
 
+        print("adv", adv)
+        print("val", val)
+
         x = val + (adv - adv.mean(1, keepdim=True).expand(-1, self.num_moves))
 
         return x
