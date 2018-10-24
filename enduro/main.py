@@ -183,7 +183,7 @@ def optimize(M):
 
     # Transpose transitions for PyTorch (i.e. examples along axis 0)
     non_final_next_states = T.cat(
-        [s for s in batch.next_state if s is not None], dim=0)
+        [s.unsqueeze(0) for s in batch.next_state if s is not None], dim=0)
     state_batch = T.cat(batch.state)
     action_batch = T.cat(batch.action)
     reward_batch = T.cat(batch.reward)
@@ -199,8 +199,7 @@ def optimize(M):
 
     next_state_values = T.zeros(BATCH_SIZE, device=M.device)
 
-    # next_state_values[non_final_mask] = \
-    #     M.target(non_final_next_states).max(dim=1)[0].detach()
+    print(non_final_next_states.shape())
 
     # Implement Double Q-Learning
     est_best_actions = M.target(non_final_next_states).argmax(dim=1).detach().view(-1, 1)
