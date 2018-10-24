@@ -29,6 +29,10 @@ transform = V.Compose([
     V.ToTensor()
 ])
 
+disp_transform = V.Compose([
+    V.ToTensor()
+])
+
 # Runtime variables
 DISPLAY_ENABLED = os.environ["DISP"].lower() == "y"
 DISPLAY_WIDTH = 600
@@ -118,11 +122,13 @@ def train(M):
         
         prev_frame = T.tensor(frame)
         frame, reward, done, _ = env.step(action)
+        disp_frame = disp_transform(frame)
         frame = transform(frame)
         reward = T.tensor([float(np.sign(int(reward)))], device=M.device)
 
         if DISPLAY_ENABLED:
-            M.display.draw_pytorch_tensor(frame, 0, 0)
+            M.display.draw_pytorch_tensor(disp_frame, 0, 0, scale=2)
+            M.display.draw_pytorch_tensor(frame, 330, 0, scale=2)
             action_label = "[i] action: {}".format(M.action_db[action])
             M.display.draw_text(action_label, 10, DISPLAY_HEIGHT - 30)
             eps_label = "[i] eps: {:0.2f} (random? {})".format(eps, was_random)
