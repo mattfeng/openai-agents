@@ -221,8 +221,6 @@ def optimize(M):
     if M.steps % 20 == 0:
         print(".", end="", flush=True)
     
-    print(loss.item())
-
     return loss
 
 
