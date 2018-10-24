@@ -45,7 +45,7 @@ EPS_END = 0.05
 EPS_DECAY = 5e5
 STEPS_BEFORE_TRAIN = 5
 BATCH_SIZE = 32
-TARGET_UPDATE = 10
+TARGET_UPDATE = 4
 
 REPLAY_BUF_SIZE = 30000
 GAMMA = 0.99 # decay rate
@@ -228,7 +228,7 @@ def optimize(M):
 def main(*args, **kwargs):
     M = kwargs["M"]
 
-    M.env = gym.make("Enduro-v0")
+    M.env = gym.make("BreakoutDeterministic-v4")
 
     # Print general information about the environment
     print(M.env.action_space)
