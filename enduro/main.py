@@ -74,6 +74,9 @@ def test(M):
             eps = 0.1
             action, was_random, action_values = rl.epsilon_greedy(
                 M.env.action_space.n, state, M.policy, eps)
+            
+            if was_random:
+                action = 1
 
             if duration % 50 == 0:
                 print("action values: {}".format(action_values))
