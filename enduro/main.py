@@ -71,7 +71,7 @@ def test(M):
             state = T.cat([frame, prev_frame], dim=0)
             state = state.to(M.device)
 
-            eps = 0.0
+            eps = 0.1
             action, was_random, action_values = rl.epsilon_greedy(
                 M.env.action_space.n, state, M.policy, eps)
 
@@ -230,7 +230,7 @@ def optimize(M):
 def main(*args, **kwargs):
     M = kwargs["M"]
 
-    M.env = gym.make("Enduro-v0")
+    M.env = gym.make("BreakoutDeterministic-v0")
 
     # Print general information about the environment
     print(M.env.action_space)
