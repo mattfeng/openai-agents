@@ -41,11 +41,11 @@ DISPLAY_HEIGHT = 600
 # Hyperparameters
 EPOCHS = 10000
 EPS_START = 1.00
-EPS_END = 0.05
-EPS_DECAY = 5e5
-STEPS_BEFORE_TRAIN = 2500
+EPS_END = 0.1
+EPS_DECAY = 1e6
+STEPS_BEFORE_TRAIN = 25000
 BATCH_SIZE = 32
-TARGET_UPDATE = 4
+TARGET_UPDATE = 10
 
 REPLAY_BUF_SIZE = 30000
 GAMMA = 0.99 # decay rate
@@ -76,7 +76,7 @@ def test(M):
                 M.env.action_space.n, state, M.policy, eps)
             
             if was_random:
-                action = 1
+                action = 0
 
             if duration % 50 == 0:
                 print("action values: {}".format(action_values))
@@ -201,11 +201,13 @@ def optimize(M):
     state_action_values = M.policy(state_batch).gather(1, action_batch.view(-1, 1))
 
     next_state_values = T.zeros(BATCH_SIZE, device=M.device)
+    next_state_values[non_final_mask] = \
+        M.target(non_final_next_states).max(dim=1)[0].detach()
 
     # Implement Double Q-Learning
-    est_best_actions = M.target(non_final_next_states).argmax(dim=1).detach().view(-1, 1)
-    next_state_values[non_final_mask] = M.policy(
-        non_final_next_states).detach().gather(1, est_best_actions).squeeze()
+    # est_best_actions = M.target(non_final_next_states).argmax(dim=1).detach().view(-1, 1)
+    # next_state_values[non_final_mask] = M.policy(
+    #     non_final_next_states).detach().gather(1, est_best_actions).squeeze()
 
     # Update only those Q(s, a) where we actually took action a
     expected_state_action_values = reward_batch + (GAMMA * next_state_values)
@@ -231,7 +233,7 @@ def optimize(M):
 def main(*args, **kwargs):
     M = kwargs["M"]
 
-    M.env = gym.make("BreakoutDeterministic-v0")
+    M.env = gym.make("Enduro-v0")
 
     # Print general information about the environment
     print(M.env.action_space)
