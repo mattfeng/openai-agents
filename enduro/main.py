@@ -123,7 +123,7 @@ def train(M):
         action, was_random, action_values  = rl.epsilon_greedy(
             env.action_space.n, state, M.policy, eps)
 
-        print("actions:", action_values)
+        print("actions:", M.policy(state))
         
         prev_frame = T.tensor(frame)
         frame, reward, done, _ = env.step(action)
