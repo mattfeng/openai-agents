@@ -50,7 +50,7 @@ TARGET_UPDATE = 4
 REPLAY_BUF_SIZE = 30000
 GAMMA = 0.99 # decay rate
 
-LEARNING_RATE = 0.00025
+LEARNING_RATE = 0.00005
 
 def test(M):
     M.log("begin TESTING")
