@@ -20,7 +20,7 @@ import torchvision.transforms as V
 
 import numpy as np
 
-from model import DuelingDQN
+from model import DuelingDQN, DQN
 
 transform = V.Compose([
     V.ToPILImage(),
