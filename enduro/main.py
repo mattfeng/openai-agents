@@ -187,7 +187,7 @@ def optimize(M):
     action_batch = action_batch.to(M.device)
     reward_batch = reward_batch.to(M.device)
 
-    # Get the values of Q for the actions that we actually took
+    # Get the values of Q(s, a) for the actions that we actually took
     state_action_values = M.policy(state_batch).gather(1, action_batch.view(-1, 1))
 
     next_state_values = T.zeros(BATCH_SIZE, device=M.device)
