@@ -50,7 +50,7 @@ TARGET_UPDATE = 10
 REPLAY_BUF_SIZE = 30000
 GAMMA = 0.99 # decay rate
 
-LEARNING_RATE = 0.00005
+LEARNING_RATE = 0.00025
 
 def test(M):
     M.log("begin TESTING")
@@ -157,11 +157,11 @@ def train(M):
         # Update M.policy with DDQN Q-learning algorithm
         if M.steps > STEPS_BEFORE_TRAIN and len(M.memory) > BATCH_SIZE:
             loss = optimize(M)
-            if loss is not None:
-                total_loss += loss
-                num_loss += 1
+            total_loss += loss
+            num_loss += 1
 
         if done:
+            print()
             break
 
     # Update the target network
@@ -220,6 +220,8 @@ def optimize(M):
 
     if M.steps % 20 == 0:
         print(".", end="", flush=True)
+    
+    print(loss.item())
 
     return loss
 
