@@ -4,7 +4,7 @@ import gym
 
 import os
 import sys
-sys.path.append('/Users/mattfeng/torchutils/')
+sys.path.append("{}/torchutils/".format(os.environ["HOME"]))
 from torchutils.bootstrap import bootstrap
 from torchutils.viz.display import Display
 import torchutils.models.rl as rl
