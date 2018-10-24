@@ -183,7 +183,7 @@ def optimize(M):
 
     # Transpose transitions for PyTorch (i.e. examples along axis 0)
     non_final_next_states = T.cat(
-        [s.unsqueeze(0) for s in batch.next_state if s is not None], dim=0)
+        [s for s in batch.next_state if s is not None], dim=0)
     state_batch = T.cat(batch.state)
     action_batch = T.cat(batch.action)
     reward_batch = T.cat(batch.reward)
