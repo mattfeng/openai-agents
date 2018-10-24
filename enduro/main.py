@@ -199,7 +199,7 @@ def optimize(M):
 
     next_state_values = T.zeros(BATCH_SIZE, device=M.device)
 
-    print(non_final_next_states.shape())
+    print(non_final_next_states.size())
 
     # Implement Double Q-Learning
     est_best_actions = M.target(non_final_next_states).argmax(dim=1).detach().view(-1, 1)
