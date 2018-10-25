@@ -129,14 +129,11 @@ def train(M):
         prev_frame = T.tensor(frame)
         frame, reward, done, _ = env.step(action)
         if reward > 0:
-            print("reward (raw):", reward)
+            print("+reward (raw):", reward)
 
         disp_frame = disp_transform(frame)
         frame = transform(frame)
         reward = T.tensor([float(np.sign(int(reward)))], device=M.device)
-
-        if abs(reward.item()) < 1e-8:
-            reward -= 0.001
 
         cum_reward += reward.item()
 
