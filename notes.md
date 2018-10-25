@@ -1,4 +1,12 @@
 
+# Unsqueezing
+```python
+>>> ts = [torch.tensor(np.random.randn(2, 84, 84)) for _ in range(32)]
+>>> torch.sum(torch.cat(ts, 0).view(-1, 2, 84, 84) - torch.cat(
+    [t.unsqueeze(0) for t in ts] , 0))
+tensor(0., dtype=torch.float64)
+```
+
 # Errors
 Error: `The number of sizes provided must be greater or equal to the number of dimensions in the tensor`
 
