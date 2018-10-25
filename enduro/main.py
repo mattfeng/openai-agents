@@ -128,15 +128,15 @@ def train(M):
 
         prev_frame = T.tensor(frame)
         frame, reward, done, _ = env.step(action)
-        cum_reward += reward
-
 
         disp_frame = disp_transform(frame)
         frame = transform(frame)
         reward = T.tensor([float(np.sign(int(reward)))], device=M.device)
 
         if abs(reward.item()) < 1e-8:
-            reward -= 0.001 * duration
+            reward -= 0.0001
+
+        cum_reward += reward.item()
 
         if DISPLAY_ENABLED:
             M.display.draw_pytorch_tensor(disp_frame, 0, 0, scale=2)
