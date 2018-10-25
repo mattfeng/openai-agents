@@ -205,13 +205,13 @@ def optimize(M):
 
     next_state_values = T.zeros(BATCH_SIZE, device=M.device)
 
-    next_state_values[non_final_mask] = \
-        M.target(non_final_next_states).max(dim=1)[0].detach()
+    # next_state_values[non_final_mask] = \
+    #     M.target(non_final_next_states).max(dim=1)[0].detach()
 
     # Implement Double Q-Learning
-    # est_best_actions = M.policy(non_final_next_states).argmax(dim=1).view(-1, 1)
-    # next_state_values[non_final_mask] = M.target(
-    #     non_final_next_states).detach().gather(1, est_best_actions).squeeze()
+    est_best_actions = M.policy(non_final_next_states).argmax(dim=1).view(-1, 1)
+    next_state_values[non_final_mask] = M.target(
+        non_final_next_states).detach().gather(1, est_best_actions).squeeze()
 
     # Update only those Q(s, a) where we actually took action a
     expected_state_action_values = reward_batch + (GAMMA * next_state_values)
