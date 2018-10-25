@@ -238,7 +238,7 @@ def optimize(M):
 def main(*args, **kwargs):
     M = kwargs["M"]
 
-    M.env = gym.make("BreakoutDeterministic-v4")
+    M.env = gym.make("Enduro-v0")
 
     # Print general information about the environment
     print(M.env.action_space)
