@@ -128,6 +128,8 @@ def train(M):
 
         prev_frame = T.tensor(frame)
         frame, reward, done, _ = env.step(action)
+        if reward > 0:
+            print("reward (raw):", reward)
 
         disp_frame = disp_transform(frame)
         frame = transform(frame)
