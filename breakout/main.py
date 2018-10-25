@@ -95,6 +95,7 @@ def optimize_model(M):
     M.optim().zero_grad()
     loss.backward()
     for param in M.policy.parameters():
+        print(param.grad.data)
         param.grad.data.clamp_(-1, 1)
     M.optim().step()
 
