@@ -134,7 +134,7 @@ def train(M):
         reward = T.tensor([float(np.sign(int(reward)))], device=M.device)
 
         if abs(reward.item()) < 1e-8:
-            reward -= 0.0001
+            reward -= 0.001
 
         cum_reward += reward.item()
 
