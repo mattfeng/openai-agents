@@ -123,7 +123,7 @@ def train(M):
 
         # Compute an action using the epsilon greedy policy
         state = state.to(M.device)
-        action, was_random, action_values  = rl.epsilon_greedy(
+        action, was_random, action_values  = rl.softmax(
             env.action_space.n, state, M.policy, eps)
 
         prev_frame = T.tensor(frame)
