@@ -50,7 +50,7 @@ TARGET_UPDATE = 10
 REPLAY_BUF_SIZE = 30000
 GAMMA = 0.99 # decay rate
 
-LEARNING_RATE = 0.00005
+LEARNING_RATE = 0.00025
 
 def test(M):
     M.log("begin TESTING")
@@ -71,14 +71,14 @@ def test(M):
             state = T.cat([frame, prev_frame], dim=0)
             state = state.to(M.device)
 
-            eps = 0.1
+            eps = 0.0
             action, was_random, action_values = rl.epsilon_greedy(
                 M.env.action_space.n, state, M.policy, eps)
             
             if was_random:
                 action = 0
 
-            if duration % 50 == 0:
+            if duration % 200 == 0:
                 print("action values: {}".format(action_values))
 
             prev_frame = T.tensor(frame)
@@ -277,9 +277,10 @@ def main(*args, **kwargs):
 
     for M.epoch in range(EPOCHS):
         reward, duration, avg_loss = train(M)
-        M.log("[train/{}] reward={:.4f} duration={:.0f} avg_loss={:0.6f}".format(
-            M.epoch, reward, duration, avg_loss
+        M.log("[train/{}] reward={:.4f} duration={:.0f} avg_loss={:0.6f} eps={:0.3f}".format(
+            M.epoch, reward, duration, avg_loss, M.eps
         ))
+
         reward, duration = test(M)
         M.data("[test/{}] reward={:.4f} duration={:.0f}".format(
             M.epoch, reward, duration
