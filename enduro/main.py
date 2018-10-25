@@ -224,7 +224,7 @@ def optimize(M):
     M.optim().zero_grad()
     loss.backward()
     for param in M.policy.parameters():
-        print(param.grad.data)
+        # print(param.grad.data)
         param.grad.data.clamp_(-10, 10) # Clip gradients
     M.optim().step()
 
