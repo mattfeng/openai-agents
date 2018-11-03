@@ -4,3 +4,4 @@ __pycache__/
 zips/
 log*
 logs/
+tensorboard/
