@@ -1,12 +1,13 @@
 import tensorflow as tf
 from tfutils.funcs import *
 
-class Agent():
+class Agent(object):
     def __init__(self, M):
         self.M = M
-        self.states = tf.placeholder()
-        self.actions = tf.placeholder()
-        self.discounted_returns = tf.placeholder()
+        self.states = tf.placeholder(tf.float32, [None, M.env.state_size], name="states")
+        self.actions = tf.placeholder(tf.int32, [None, M.env.action_space.n], name="actions")
+        self.discounted_returns = tf.placeholder(tf.float32, [None,], name="discounted_returns")
+        self.mean_return = tf.placeholder(tf.float32, name="mean_return")
 
         Linear = tf.contrib.layers.fully_connected
         xavier_init = tf.contrib.layers.xavier_initializer
@@ -48,11 +49,11 @@ class Agent():
                 logits=self.fc3,
                 labels=self.actions
             )
-            neg_objective = tf.reduce_mean(nll * self.discounted_returns)
+            self.neg_objective = tf.reduce_mean(nll * self.discounted_returns)
 
         with tf.name_scope("optimize"):
-            train_opt = tf.train.AdamOptimizer(learning_rate=M.lr).minimize(
-                neg_objective)
+            self.train_op = tf.train.AdamOptimizer(learning_rate=M.lr).minimize(
+                self.neg_objective)
 
 
 

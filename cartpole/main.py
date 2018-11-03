@@ -1,5 +1,12 @@
+import gym
+
 import tensorflow as tf
 from tfutils.env import Environment
+from tfutils.bootstrap import init_tensorboard
+
+from model import Agent
+
+import numpy as np
 
 LEARNING_RATE = 0.01
 GAMMA = 0.99
@@ -16,32 +23,119 @@ def discounted_returns(rewards, normalize=True):
     """
     discounted_g = np.zeros_like(rewards)
     cumsum = 0
-    for t in range(rewards.size - 1, -1, -1):
+    for t in range(len(rewards) - 1, -1, -1):
         cumsum = cumsum * GAMMA + rewards[t]
         discounted_g[t] = cumsum
     
     mean = np.mean(discounted_g)
-    stdev = np.stdev(discounted_g)
+    stdev = np.std(discounted_g)
 
     return (discounted_g - mean) / stdev
-
 
 def test():
     pass
 
 def train(M):
-    pass
+    episode_states = []
+    episode_actions = []
+    episode_rewards = []
+    
+    # Launch the game
+    state = M.env.reset()
+        
+    M.env.render()
+           
+    while True:
+        policy = M.sess.run(M.agent.policy, feed_dict={
+            M.agent.states: state.reshape([1, 4])
+        })
+            
+        # select action w.r.t the actions prob
+        action = np.random.choice(range(policy.shape[1]), p=policy.ravel())
 
+        # Perform a
+        new_state, reward, done, info = M.env.step(action)
+
+        # Store s, a, r
+        episode_states.append(state)
+        action_onehot = np.zeros(M.env.action_space.n)
+        action_onehot[action] = 1
+        episode_actions.append(action_onehot)
+        episode_rewards.append(reward)
+
+        if done:
+            # Calculate return
+            episode_return = np.sum(episode_rewards)
+            M.all_returns.append(episode_return)
+            M.total_returns += episode_return
+
+            # Mean return
+            mean_return = np.divide(M.total_returns, M.episode + 1)
+
+            # Maximum return
+            M.max_return = np.amax(M.all_returns)
+                
+            # Calculate discounted returns
+            discounted_g = discounted_returns(episode_rewards)
+                                
+            # Feedforward, gradient and backpropagation
+            neg_obj, _ = M.sess.run([M.agent.neg_objective, M.agent.train_op], feed_dict={
+                M.agent.states: np.vstack(np.array(episode_states)),
+                M.agent.actions: np.vstack(np.array(episode_actions)),
+                M.agent.discounted_returns: discounted_g 
+            })
+                                                                 
+            # Write TF Summaries
+            summary = M.sess.run(M.write_op, feed_dict={
+                M.agent.states: np.vstack(np.array(episode_states)),
+                M.agent.actions: np.vstack(np.array(episode_actions)),
+                M.agent.discounted_returns: discounted_g,
+                M.agent.mean_return: mean_return
+            })
+                
+            M.writer.add_summary(summary, M.episode)
+            M.writer.flush()
+
+            return episode_return, mean_return
+            
+        state = new_state
 
 
 def main():
     M = Environment()
     M.env = gym.make("CartPole-v0")
-    for ep in range(NUM_EPISODES):
-        train(M)
+    M.env.state_size = 4
 
-        if ep % 100:
-            test(M)
+    # Hyperparameters
+    M.lr = LEARNING_RATE
+
+    M.agent = Agent(M)
+    M.writer = init_tensorboard()
+    tf.summary.scalar("Negative J(theta)", M.agent.neg_objective)
+    tf.summary.scalar("Mean Return", M.agent.mean_return)
+    M.write_op = tf.summary.merge_all()
+
+    M.all_returns = []
+    M.total_returns = 0
+    M.max_return = 0
+
+    
+    with tf.Session() as sess:
+        M.sess = sess
+        M.sess.run(tf.global_variables_initializer())
+
+        for ep in range(NUM_EPISODES):
+            M.episode = ep
+            ep_return, mean_return =  train(M)
+
+            print("==========================================")
+            print("Episode: {}".format(M.episode))
+            print("Return: {}".format(ep_return))
+            print("Mean Return {}".format(mean_return))
+            print("Max Return: {}".format(M.max_return))
+
+            # if ep % 100:
+            #     test(M)
 
     
 
