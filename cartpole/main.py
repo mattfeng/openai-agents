@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import gym
 
 import tensorflow as tf
@@ -31,9 +33,6 @@ def discounted_returns(rewards, normalize=True):
     stdev = np.std(discounted_g)
 
     return (discounted_g - mean) / stdev
-
-def test():
-    pass
 
 def train(M):
     episode_states = []
@@ -128,16 +127,12 @@ def main():
             M.episode = ep
             ep_return, mean_return =  train(M)
 
-            print("==========================================")
-            print("Episode: {}".format(M.episode))
-            print("Return: {}".format(ep_return))
-            print("Mean Return {}".format(mean_return))
-            print("Max Return: {}".format(M.max_return))
-
-            # if ep % 100:
-            #     test(M)
-
-    
+            print("[ep/{}] G: {:>5.0f} mean_G: {:>5.0f} "
+                  "max_G: {:>5.0f}".format(
+                      M.episode,
+                      ep_return,
+                      mean_return,
+                      M.max_return))
 
 if __name__ == "__main__":
     main()
