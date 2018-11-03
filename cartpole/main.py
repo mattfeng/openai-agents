@@ -1,7 +1,9 @@
 import tensorflow as tf
+from tfutils.env import Environment
 
+LEARNING_RATE = 0.01
 GAMMA = 0.99
-NUM_EPISODES = 5000
+NUM_EPISODES = 10000
 MAX_STEPS = 999
 
 def discounted_returns(rewards, normalize=True):
@@ -27,11 +29,20 @@ def discounted_returns(rewards, normalize=True):
 def test():
     pass
 
-def train():
+def train(M):
+    pass
+
 
 
 def main():
-    for i in 
+    M = Environment()
+    M.env = gym.make("CartPole-v0")
+    for ep in range(NUM_EPISODES):
+        train(M)
+
+        if ep % 100:
+            test(M)
+
     
 
 if __name__ == "__main__":
