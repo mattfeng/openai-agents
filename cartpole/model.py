@@ -49,6 +49,16 @@ class Agent(object):
                 logits=self.fc3,
                 labels=self.actions
             )
+
+            # grad(f(x); theta) means gradient of f(x) w.r.t. theta
+            # estimate grad(J;theta) stochastically via
+            # a single sample (i.e. a single trajectory tau);
+            # in other words, grad(loglikelihood * discounted_returns)
+            # approximates grad(J; theta), so use
+            # nll * discounted_returns as the objective
+            # we want to minimize (since we actually want max
+            # of ll * discounted_returns)
+            # nll * discounted_returns thus takes the form of a `loss`
             self.neg_objective = tf.reduce_mean(nll * self.discounted_returns)
 
         with tf.name_scope("optimize"):
