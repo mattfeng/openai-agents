@@ -17,6 +17,8 @@ from model import Agent
 
 import numpy as np
 
+from collections import deque
+
 import os
 
 DISPLAY_WIDTH = 600
@@ -25,6 +27,7 @@ DISP = os.environ["DISP"] == "y"
 
 NUM_EPISODES = 10000
 GAMMA = 0.99
+FRAME_BUFFER_SIZE = 4
 OPTIMIZER_OPTIONS = {
     "learning_rate": 0.001
 }
@@ -66,12 +69,25 @@ def train(M):
     actions = []
     rewards = []
 
+    stacked_frames = deque()
+
     while True:
         # Preprocess state
+        if len(stacked_frames) >= FRAME_BUFFER_SIZE:
+            stacked_frames.popleft()
+
         state = preprocess_state(state)
-        policy = M.sess.run(M.agent.policy, feed_dict={
-            M.agent.states: state.reshape([1, 84, 84, 1])
-        })
+        stacked_frames.append(state)
+
+        if len(stacked_frames) < FRAME_BUFFER_SIZE:
+            policy = np.ones(M.env.action_space.n) / M.env.action_space.n
+        else:
+            stacked_states = np.dstack(stacked_frames)
+            policy = M.sess.run(M.agent.policy, feed_dict={
+                M.agent.states: stacked_states.reshape([1, 84, 84, 4])
+            })
+            states.append(stacked_states)
+
         policy = policy.squeeze() # policy.shape: (1, 6) -> (6, )
 
         action = np.random.choice(
@@ -80,13 +96,12 @@ def train(M):
 
         next_state, reward, done, _ = M.env.step(action)
 
-        states.append(state)
-        rewards.append(reward)
-
         action_onehot = np.zeros_like(policy)
         action_onehot[action] = 1
 
-        actions.append(action_onehot)
+        if len(stacked_frames) == FRAME_BUFFER_SIZE:
+            rewards.append(reward)
+            actions.append(action_onehot)
 
         M.env.render()
         if DISP:
