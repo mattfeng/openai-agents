@@ -36,7 +36,7 @@ OPTIMIZER_OPTIONS = {
 def preprocess_state(state):
     state = color.rgb2gray(state)
     resized = resize(state, (84, 84, 1), anti_aliasing=False)
-    normalized = resized / 255.
+    normalized = resized / 255. - 0.5
     return normalized
 
 def discounted_returns(rewards, normalize=True):
@@ -111,7 +111,6 @@ def train(M):
             episode_return = np.sum(rewards)
             M.total_return += episode_return
             mean_return = M.total_return / (M.ep + 1)
-            np_states = np.array(states)
 
             neg_obj, _ = M.sess.run([M.agent.neg_obj, M.agent.train_op],
                 feed_dict={
