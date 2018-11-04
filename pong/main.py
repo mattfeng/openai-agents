@@ -7,7 +7,11 @@ import tensorflow as tf
 from tfutils.viz.display import Display
 from tfutils.env import Environment
 from tfutils.bootstrap import init_tensorboard
-from tfutils.preprocess import rgb_to_gray
+
+import matplotlib.pyplot as plt
+
+from skimage import data, color
+from skimage.transform import resize
 
 from model import Agent
 
@@ -22,8 +26,12 @@ DISP = os.environ["DISP"] == "y"
 NUM_EPISODES = 10000
 GAMMA = 0.99
 OPTIMIZER_OPTIONS = {
-    "learning_rate": 0.01
+    "learning_rate": 0.001
 }
+
+def preprocess_state(state):
+    state = color.rgb2gray(state)
+    return resize(state, (84, 84, 1), anti_aliasing=False)
 
 def discounted_returns(rewards, normalize=True):
     """
@@ -58,9 +66,9 @@ def train(M):
 
     while True:
         # Preprocess state
-        state = rgb_to_gray(state)
+        state = preprocess_state(state)
         policy = M.sess.run(M.agent.policy, feed_dict={
-            M.agent.states: state.reshape([-1, 210, 160, 1])
+            M.agent.states: state.reshape([1, 84, 84, 1])
         })
         policy = policy.squeeze() # policy.shape: (1, 6) -> (6, )
 
@@ -78,12 +86,14 @@ def train(M):
 
         actions.append(action_onehot)
 
+        M.env.render()
         if DISP:
             M.display.draw_vector(state, 0, 0, scale=2)
 
         if done:
             episode_return = np.sum(rewards)
             M.total_return += episode_return
+            mean_return = M.total_return / (M.ep + 1)
 
             neg_obj, _ = M.sess.run([M.agent.neg_obj, M.agent.train_op],
                 feed_dict={
@@ -100,7 +110,7 @@ def train(M):
             M.writer.add_summary(summary)
             M.writer.flush()
 
-            return episode_return, neg_obj
+            return episode_return, mean_return, neg_obj
         
         state = next_state
     
@@ -129,9 +139,9 @@ def main():
 
         for ep in range(NUM_EPISODES):
             M.ep = ep
-            episode_return, neg_obj = train(M)
-            print("[ep/{}] G: {:5.2f} -J(theta): {:0.12f}".format(
-                M.ep, episode_return, neg_obj))
+            episode_return, mean_return, neg_obj = train(M)
+            print("[ep/{}] G: {:5.2f} meanG: {:5.2f} -J(theta): {:0.12f}".format(
+                M.ep, episode_return, mean_return, neg_obj))
 
     
 if __name__ == "__main__":

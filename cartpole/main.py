@@ -76,7 +76,7 @@ def train(M):
                 
             # Calculate discounted returns
             discounted_g = discounted_returns(episode_rewards)
-                                
+
             # Feedforward, gradient and backpropagation
             neg_obj, _ = M.sess.run([M.agent.neg_objective, M.agent.train_op], feed_dict={
                 M.agent.states: np.vstack(np.array(episode_states)),

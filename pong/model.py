@@ -23,7 +23,7 @@ class Agent(object):
         with tf.name_scope("inputs"):
             self.states = tf.placeholder(
                 tf.float32,
-                [None, 210, 160, 1],
+                [None, 84, 84, 1],
                 "states")
             self.actions = tf.placeholder(
                 tf.int32,
@@ -38,7 +38,7 @@ class Agent(object):
             with tf.name_scope("conv1"):
                 self.conv1 = conv2d(
                     self.states,
-                    filters=16,
+                    filters=128,
                     kernel_size=8,
                     padding="same",
                     strides=4
@@ -47,7 +47,7 @@ class Agent(object):
             with tf.name_scope("conv2"):
                 self.conv2 = conv2d(
                     self.conv1,
-                    filters=16,
+                    filters=256,
                     kernel_size=4,
                     padding="same",
                     strides=3
@@ -56,17 +56,17 @@ class Agent(object):
             with tf.name_scope("conv3"):
                 self.conv3 = conv2d(
                     self.conv2,
-                    filters=8,
+                    filters=64,
                     kernel_size=3,
                     padding="same",
                     strides=1
                 )
 
             with tf.name_scope("fc1"):
-                self.conv_features = self.conv3.reshape([-1, 1120])
+                self.conv_features = self.conv3.reshape([-1, 7 * 7 * 64])
                 self.fc1 = Linear(
                     self.conv_features,
-                    num_outputs=512
+                    num_outputs=40
                 )
 
             with tf.name_scope("fc2"):
@@ -86,7 +86,7 @@ class Agent(object):
             self.neg_obj = tf.reduce_mean(nll * self.discounted_returns)
 
         with tf.name_scope("optimizer"):
-            self.train_op = tf.train.AdagradOptimizer(
+            self.train_op = tf.train.GradientDescentOptimizer(
                 **optimizer_options).minimize(self.neg_obj)
 
 
