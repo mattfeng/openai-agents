@@ -29,7 +29,8 @@ NUM_EPISODES = 10000
 GAMMA = 0.99
 FRAME_BUFFER_SIZE = 4
 OPTIMIZER_OPTIONS = {
-    "learning_rate": 0.001
+    "learning_rate": 1e-4,
+    "decay": 0.99
 }
 
 def preprocess_state(state):
@@ -103,7 +104,6 @@ def train(M):
             rewards.append(reward)
             actions.append(action_onehot)
 
-        M.env.render()
         if DISP:
             M.display.draw_vector(state, 0, 0, scale=2)
 
