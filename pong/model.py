@@ -33,7 +33,6 @@ class Agent(object):
                 tf.float32,
                 [None,],
                 "discounted_returns")
-            
 
         with tf.name_scope("model"):
             with tf.name_scope("conv1"):
@@ -51,7 +50,7 @@ class Agent(object):
                     filters=16,
                     kernel_size=4,
                     padding="same",
-                    strides=4
+                    strides=3
                 )
 
             with tf.name_scope("conv3"):
@@ -67,7 +66,7 @@ class Agent(object):
                 self.conv_features = self.conv3.reshape([-1, 1120])
                 self.fc1 = Linear(
                     self.conv_features,
-                    num_outputs=32
+                    num_outputs=512
                 )
 
             with tf.name_scope("fc2"):
