@@ -86,7 +86,7 @@ def train(M):
         else:
             stacked_states = np.dstack(stacked_frames)
             policy = M.sess.run(M.agent.policy, feed_dict={
-                M.agent.states: stacked_states.reshape([1, 84, 84, 4])
+                M.agent.states: stacked_states.reshape([1, 80, 80, 1])
             })
             states.append(stacked_states)
 
