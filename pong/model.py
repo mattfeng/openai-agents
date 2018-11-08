@@ -23,7 +23,7 @@ class Agent(object):
         with tf.name_scope("inputs"):
             self.states = tf.placeholder(
                 tf.float32,
-                [None, 84, 84, 4],
+                [None, 80, 80, 1],
                 "states")
             self.actions = tf.placeholder(
                 tf.int32,
