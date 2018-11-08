@@ -12,7 +12,7 @@ class Agent(object):
         self.M = M
 
         conv2d = tf.layers.conv2d
-        Linear = tf.contrib.layers.fully_connected
+        Dense = tf.layers.Dense
         xntropy = tf.nn.softmax_cross_entropy_with_logits_v2
 
         with tf.name_scope("informative"):
@@ -67,16 +67,17 @@ class Agent(object):
             #     )
 
             with tf.name_scope("fc1"):
-                self.fc0 = self.states.reshape([-1, 84 * 84 * 4])
-                self.fc1 = Linear(
+                self.fc0 = self.states.reshape([-1, 6400 * 1])
+                self.fc1 = tf.layers.dense(
                     self.fc0,
-                    num_outputs=512
+                    units=256,
+                    activation=tf.nn.relu
                 )
 
             with tf.name_scope("fc2"):
-                self.fc2 = Linear(
+                self.fc2 = tf.layers.dense(
                     self.fc1,
-                    num_outputs=self.M.env.action_space.n
+                    units=self.M.env.action_space.n
                 )
             
             with tf.name_scope("softmax"):
@@ -87,7 +88,7 @@ class Agent(object):
                 logits=self.fc2,
                 labels=self.actions
             )
-            self.neg_obj = tf.reduce_mean(nll * self.discounted_returns)
+            self.neg_obj = tf.reduce_sum(nll * self.discounted_returns)
 
         with tf.name_scope("optimizer"):
             self.train_op = tf.train.RMSPropOptimizer(

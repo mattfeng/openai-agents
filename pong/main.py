@@ -27,16 +27,17 @@ DISP = os.environ["DISP"] == "y"
 
 NUM_EPISODES = 10000
 GAMMA = 0.99
-FRAME_BUFFER_SIZE = 4
+FRAME_BUFFER_SIZE = 1
 OPTIMIZER_OPTIONS = {
-    "learning_rate": 1e-4,
+    "learning_rate": 1e-3,
     "decay": 0.99
 }
 
 def preprocess_state(state):
+    state = state[35:195]
     state = color.rgb2gray(state)
-    resized = resize(state, (84, 84, 1), anti_aliasing=False)
-    normalized = resized / 255. - 0.5
+    resized = resize(state, (80, 80, 1), anti_aliasing=False)
+    normalized = resized / 255.
     return normalized
 
 def discounted_returns(rewards, normalize=True):
