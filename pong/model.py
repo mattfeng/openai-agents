@@ -35,37 +35,41 @@ class Agent(object):
                 "discounted_returns")
 
         with tf.name_scope("model"):
-            with tf.name_scope("conv1"):
-                self.conv1 = conv2d(
-                    self.states,
-                    filters=32,
-                    kernel_size=8,
-                    padding="same",
-                    strides=4
-                )
+            # Is it hard to train a RL network that is
+            # too large? i.e. is there not enough signal 
+            # for any meaningful updates to occur?
 
-            with tf.name_scope("conv2"):
-                self.conv2 = conv2d(
-                    self.conv1,
-                    filters=64,
-                    kernel_size=4,
-                    padding="same",
-                    strides=3
-                )
+            # with tf.name_scope("conv1"):
+            #     self.conv1 = conv2d(
+            #         self.states,
+            #         filters=32,
+            #         kernel_size=8,
+            #         padding="same",
+            #         strides=4
+            #     )
 
-            with tf.name_scope("conv3"):
-                self.conv3 = conv2d(
-                    self.conv2,
-                    filters=64,
-                    kernel_size=3,
-                    padding="same",
-                    strides=1
-                )
+            # with tf.name_scope("conv2"):
+            #     self.conv2 = conv2d(
+            #         self.conv1,
+            #         filters=64,
+            #         kernel_size=4,
+            #         padding="same",
+            #         strides=3
+            #     )
+
+            # with tf.name_scope("conv3"):
+            #     self.conv3 = conv2d(
+            #         self.conv2,
+            #         filters=64,
+            #         kernel_size=3,
+            #         padding="same",
+            #         strides=1
+            #     )
 
             with tf.name_scope("fc1"):
-                self.conv_features = self.conv3.reshape([-1, 7 * 7 * 64])
+                self.fc0 = self.states.reshape([-1, 84 * 84 * 4])
                 self.fc1 = Linear(
-                    self.conv_features,
+                    self.fc0,
                     num_outputs=512
                 )
 
