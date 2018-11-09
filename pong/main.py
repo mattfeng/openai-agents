@@ -25,6 +25,7 @@ DISPLAY_WIDTH = 600
 DISPLAY_HEIGHT = 600
 DISP = os.environ["DISP"] == "y"
 
+START_EP = 7500
 NUM_EPISODES = 10000
 GAMMA = 0.99
 FRAME_BUFFER_SIZE = 2
@@ -129,7 +130,7 @@ def train(M):
         if done:
             episode_return = np.sum(rewards)
             M.total_return += episode_return
-            mean_return = M.total_return / (M.ep + 1)
+            mean_return = M.total_return / (M.ep - START_EP + 1)
 
             # print(discounted_returns_(np.array(rewards), False))
             # print(discounted_returns(np.array(rewards)))
@@ -177,16 +178,15 @@ def main():
         M.sess = sess
         M.sess.run(tf.global_variables_initializer())
 
-        START_EP = 7500
         M.saver.restore(M.sess, "./models/model-{}.cpkt".format(START_EP))
 
-        for ep in range(START_EP + 1, NUM_EPISODES):
+        for ep in range(START_EP, NUM_EPISODES):
             M.ep = ep
             episode_return, mean_return, neg_obj = train(M)
             print("[ep/{:>5d}] G: {:6.2f} | meanG: {:6.2f} | -J(theta): {:0.12f}".format(
                 M.ep, episode_return, mean_return, neg_obj))
             
-            if ep % 100 == 0 and ep != 0:
+            if ep % 100 == 0 and ep != START_EP:
                 M.saver.save(M.sess, "./models/model-{}.cpkt".format(ep))
 
     
