@@ -29,7 +29,7 @@ NUM_EPISODES = 10000
 GAMMA = 0.99
 FRAME_BUFFER_SIZE = 2
 OPTIMIZER_OPTIONS = {
-    "learning_rate": 1e-3,
+    "learning_rate": 3e-4,
     "decay": 0.99
 }
 
@@ -41,27 +41,30 @@ def preprocess_state(state):
     state = state.reshape((80, 80, 1))
     return state
 
-# def discounted_returns(rewards, normalize=True):
-#     """
-#     Args:
-#         rewards (np.array): Array of rewards at each timestep.
-#         normalize (bool): Should the returns be normalized?
-#     Returns:
-#         Array of discounted returns `G` (sum over discounted rewards).
-#     """
-#     discounted_g = np.zeros_like(rewards)
-#     cumsum = 0
-#     for t in range(len(rewards) - 1, -1, -1):
-#         cumsum = cumsum * GAMMA + rewards[t]
-#         discounted_g[t] = cumsum
+def discounted_returns_(rewards, normalize=True):
+    """
+    Args:
+        rewards (np.array): Array of rewards at each timestep.
+        normalize (bool): Should the returns be normalized?
+    Returns:
+        Array of discounted returns `G` (sum over discounted rewards).
+    """
+    discounted_g = np.zeros_like(rewards)
+    cumsum = 0
+    for t in range(len(rewards) - 1, -1, -1):
+        # reset the sum, since this was a game boundary (pong specific!)
+        if rewards[t] != 0: # this is the secret!!
+            cumsum = 0
+        cumsum = cumsum * GAMMA + rewards[t]
+        discounted_g[t] = cumsum
     
-#     mean = np.mean(discounted_g)
-#     stdev = np.std(discounted_g)
+    mean = np.mean(discounted_g)
+    stdev = np.std(discounted_g)
 
-#     if normalize:
-#         return (discounted_g - mean) / stdev
-#     print(discounted_g)
-#     return discounted_g
+    if normalize:
+        return (discounted_g - mean) / stdev
+
+    return discounted_g
 
 def discounted_returns(r):
     """ take 1D float array of rewards and compute discounted reward """
@@ -128,11 +131,14 @@ def train(M):
             M.total_return += episode_return
             mean_return = M.total_return / (M.ep + 1)
 
+            # print(discounted_returns_(np.array(rewards), False))
+            # print(discounted_returns(np.array(rewards)))
+
             neg_obj, _ = M.sess.run([M.agent.neg_obj, M.agent.train_op],
                 feed_dict={
                     M.agent.states: np.array(states).reshape([-1, 80, 80, 1]),
                     M.agent.actions: np.array(actions),
-                    M.agent.discounted_returns: discounted_returns(np.array(rewards))
+                    M.agent.discounted_returns: discounted_returns_(np.array(rewards))
                 })
 
             summary = M.sess.run(M.write_op, feed_dict={
@@ -173,7 +179,7 @@ def main():
         for ep in range(NUM_EPISODES):
             M.ep = ep
             episode_return, mean_return, neg_obj = train(M)
-            print("[ep/{}] G: {:5.2f} meanG: {:5.2f} -J(theta): {:0.12f}".format(
+            print("[ep/{:>5d}] G: {:6.2f} | meanG: {:6.2f} | -J(theta): {:0.12f}".format(
                 M.ep, episode_return, mean_return, neg_obj))
 
     
