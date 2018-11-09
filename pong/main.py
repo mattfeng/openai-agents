@@ -171,6 +171,7 @@ def main():
     print("Action set: {}".format(M.env.unwrapped._action_set))
 
     M.total_return = 0
+    M.saver = tf.train.Saver()
 
     with tf.Session() as sess:
         M.sess = sess
@@ -181,6 +182,9 @@ def main():
             episode_return, mean_return, neg_obj = train(M)
             print("[ep/{:>5d}] G: {:6.2f} | meanG: {:6.2f} | -J(theta): {:0.12f}".format(
                 M.ep, episode_return, mean_return, neg_obj))
+            
+            if ep % 100 == 0 and ep != 0:
+                M.saver.save(M.sess, "./models/model-{}.cpkt".format(ep))
 
     
 if __name__ == "__main__":
