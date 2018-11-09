@@ -35,6 +35,8 @@ OPTIMIZER_OPTIONS = {
     "decay": 0.99
 }
 
+RUNNING_WINDOW = 150
+
 def preprocess_state(state):
     state = state[35:195]
     state = state[::2, ::2, 0]
@@ -132,6 +134,10 @@ def train(M):
             episode_return = np.sum(rewards)
             M.total_return += episode_return
             mean_return = M.total_return / (M.ep - START_EP + 1)
+            M.running_mean.append(episode_return)
+            if len(M.running_mean) > RUNNING_WINDOW:
+                M.running_mean.popleft()
+            M.running_mean_ = np.mean(M.running_mean)
 
             # print(discounted_returns_(np.array(rewards), False))
             # print(discounted_returns(np.array(rewards)))
@@ -174,6 +180,8 @@ def main():
 
     M.total_return = 0
     M.saver = tf.train.Saver()
+    M.running_mean = deque()
+    M.running_mean_ = 0
 
     with tf.Session() as sess:
         M.sess = sess
@@ -184,8 +192,8 @@ def main():
         for ep in range(START_EP, NUM_EPISODES):
             M.ep = ep
             episode_return, mean_return, neg_obj = train(M)
-            print("[ep/{:>5d}] G: {:6.2f} | meanG: {:6.2f} | -J(theta): {:0.12f}".format(
-                M.ep, episode_return, mean_return, neg_obj))
+            print("[ep/{:>5d}] G: {:6.2f} | meanG: {:6.2f} | runningG: {:6.2f} | -J(theta): {:0.12f}".format(
+                M.ep, episode_return, mean_return, M.running_mean_, neg_obj))
             
             if ep % 100 == 0 and ep != START_EP:
                 M.saver.save(M.sess, "./models/model-{}.cpkt".format(ep))
