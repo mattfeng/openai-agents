@@ -27,7 +27,7 @@ DISP = os.environ["DISP"] == "y"
 
 NUM_EPISODES = 10000
 GAMMA = 0.99
-FRAME_BUFFER_SIZE = 1
+FRAME_BUFFER_SIZE = 2
 OPTIMIZER_OPTIONS = {
     "learning_rate": 1e-3,
     "decay": 0.99
@@ -35,31 +35,43 @@ OPTIMIZER_OPTIONS = {
 
 def preprocess_state(state):
     state = state[35:195]
-    state = color.rgb2gray(state)
-    resized = resize(state, (80, 80, 1), anti_aliasing=False)
-    normalized = resized / 255.
-    return normalized
+    state = state[::2, ::2, 0]
+    state[(state == 144) | (state == 109)] = 0
+    state[state != 0] = 1
+    state = state.reshape((80, 80, 1))
+    return state
 
-def discounted_returns(rewards, normalize=True):
-    """
-    Args:
-        rewards (np.array): Array of rewards at each timestep.
-        normalize (bool): Should the returns be normalized?
-    Returns:
-        Array of discounted returns `G` (sum over discounted rewards).
-    """
-    discounted_g = np.zeros_like(rewards)
-    cumsum = 0
-    for t in range(len(rewards) - 1, -1, -1):
-        cumsum = cumsum * GAMMA + rewards[t]
-        discounted_g[t] = cumsum
+# def discounted_returns(rewards, normalize=True):
+#     """
+#     Args:
+#         rewards (np.array): Array of rewards at each timestep.
+#         normalize (bool): Should the returns be normalized?
+#     Returns:
+#         Array of discounted returns `G` (sum over discounted rewards).
+#     """
+#     discounted_g = np.zeros_like(rewards)
+#     cumsum = 0
+#     for t in range(len(rewards) - 1, -1, -1):
+#         cumsum = cumsum * GAMMA + rewards[t]
+#         discounted_g[t] = cumsum
     
-    mean = np.mean(discounted_g)
-    stdev = np.std(discounted_g)
+#     mean = np.mean(discounted_g)
+#     stdev = np.std(discounted_g)
 
-    if normalize:
-        return (discounted_g - mean) / stdev
-    return discounted_g
+#     if normalize:
+#         return (discounted_g - mean) / stdev
+#     print(discounted_g)
+#     return discounted_g
+
+def discounted_returns(r):
+    """ take 1D float array of rewards and compute discounted reward """
+    discounted_r = np.zeros_like(r)
+    running_add = 0
+    for t in reversed(range(0, r.size)):
+        if r[t] != 0: running_add = 0 # reset the sum, since this was a game boundary (pong specific!)
+        running_add = running_add * GAMMA + r[t]
+        discounted_r[t] = running_add
+    return discounted_r
 
 def test(M):
     pass
@@ -82,21 +94,27 @@ def train(M):
         stacked_frames.append(state)
 
         if len(stacked_frames) < FRAME_BUFFER_SIZE:
-            policy = np.ones(M.env.action_space.n) / M.env.action_space.n
+            policy = np.ones(2) / 2
         else:
-            stacked_states = np.dstack(stacked_frames)
+            diff_state = stacked_frames[1] - stacked_frames[0]
+
+            if DISP:
+                M.display.draw_vector(diff_state * 255, 0, 0, scale=2)
+            # stacked_states = np.dstack(stacked_frames)
             policy = M.sess.run(M.agent.policy, feed_dict={
-                M.agent.states: stacked_states.reshape([1, 80, 80, 1])
+                # M.agent.states: stacked_states.reshape([1, 80, 80, 1])
+                M.agent.states: diff_state.reshape([1, 80, 80, 1])
             })
-            states.append(stacked_states)
+            # states.append(stacked_states)
+            states.append(diff_state)
 
         policy = policy.squeeze() # policy.shape: (1, 6) -> (6, )
 
         action = np.random.choice(
-            np.arange(M.env.action_space.n),
+            np.arange(2),
             p=policy)
 
-        next_state, reward, done, _ = M.env.step(action)
+        next_state, reward, done, _ = M.env.step(action + 2)
 
         action_onehot = np.zeros_like(policy)
         action_onehot[action] = 1
@@ -105,9 +123,6 @@ def train(M):
             rewards.append(reward)
             actions.append(action_onehot)
 
-        if DISP:
-            M.display.draw_vector(state, 0, 0, scale=2)
-
         if done:
             episode_return = np.sum(rewards)
             M.total_return += episode_return
@@ -115,9 +130,9 @@ def train(M):
 
             neg_obj, _ = M.sess.run([M.agent.neg_obj, M.agent.train_op],
                 feed_dict={
-                    M.agent.states: np.array(states),
+                    M.agent.states: np.array(states).reshape([-1, 80, 80, 1]),
                     M.agent.actions: np.array(actions),
-                    M.agent.discounted_returns: discounted_returns(rewards)
+                    M.agent.discounted_returns: discounted_returns(np.array(rewards))
                 })
 
             summary = M.sess.run(M.write_op, feed_dict={

@@ -12,8 +12,8 @@ class Agent(object):
         self.M = M
 
         conv2d = tf.layers.conv2d
-        Dense = tf.layers.Dense
         xntropy = tf.nn.softmax_cross_entropy_with_logits_v2
+        xavier_init = tf.contrib.layers.xavier_initializer
 
         with tf.name_scope("informative"):
             self.mean_return = tf.placeholder(
@@ -27,7 +27,7 @@ class Agent(object):
                 "states")
             self.actions = tf.placeholder(
                 tf.int32,
-                [None, self.M.env.action_space.n],
+                [None, 2],
                 "actions")
             self.discounted_returns = tf.placeholder(
                 tf.float32,
@@ -70,14 +70,15 @@ class Agent(object):
                 self.fc0 = self.states.reshape([-1, 6400 * 1])
                 self.fc1 = tf.layers.dense(
                     self.fc0,
-                    units=256,
-                    activation=tf.nn.relu
+                    units=200,
+                    activation=tf.nn.relu,
+                    kernel_initializer=xavier_init()
                 )
 
             with tf.name_scope("fc2"):
                 self.fc2 = tf.layers.dense(
                     self.fc1,
-                    units=self.M.env.action_space.n
+                    units=2
                 )
             
             with tf.name_scope("softmax"):
@@ -88,7 +89,7 @@ class Agent(object):
                 logits=self.fc2,
                 labels=self.actions
             )
-            self.neg_obj = tf.reduce_sum(nll * self.discounted_returns)
+            self.neg_obj = tf.reduce_mean(nll * self.discounted_returns)
 
         with tf.name_scope("optimizer"):
             self.train_op = tf.train.RMSPropOptimizer(
