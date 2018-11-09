@@ -177,7 +177,10 @@ def main():
         M.sess = sess
         M.sess.run(tf.global_variables_initializer())
 
-        for ep in range(NUM_EPISODES):
+        START_EP = 7500
+        M.saver.restore(M.sess, "./models/model-{}.cpkt".format(START_EP))
+
+        for ep in range(START_EP + 1, NUM_EPISODES):
             M.ep = ep
             episode_return, mean_return, neg_obj = train(M)
             print("[ep/{:>5d}] G: {:6.2f} | meanG: {:6.2f} | -J(theta): {:0.12f}".format(
