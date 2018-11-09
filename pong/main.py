@@ -25,12 +25,12 @@ DISPLAY_WIDTH = 600
 DISPLAY_HEIGHT = 600
 DISP = os.environ["DISP"] == "y"
 
-START_EP = 7500
-NUM_EPISODES = 10000
+START_EP = 9900
+NUM_EPISODES = 1000000
 GAMMA = 0.99
 FRAME_BUFFER_SIZE = 2
 OPTIMIZER_OPTIONS = {
-    "learning_rate": 3e-4,
+    "learning_rate": 1e-3,
     "decay": 0.99
 }
 
