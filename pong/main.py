@@ -20,17 +20,18 @@ import numpy as np
 from collections import deque
 
 import os
+import sys
 
 DISPLAY_WIDTH = 600
 DISPLAY_HEIGHT = 600
 DISP = os.environ["DISP"] == "y"
 
-START_EP = 9900
+START_EP = int(sys.argv[1])
 NUM_EPISODES = 1000000
 GAMMA = 0.99
 FRAME_BUFFER_SIZE = 2
 OPTIMIZER_OPTIONS = {
-    "learning_rate": 1e-3,
+    "learning_rate": 1e-4,
     "decay": 0.99
 }
 
