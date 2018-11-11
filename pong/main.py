@@ -38,7 +38,7 @@ OPTIMIZER_OPTIONS = {
     "learning_rate": 1e-3,
     "decay": 0.99
 }
-BATCH_SIZE = 10
+BATCH_SIZE = 2
 
 RUNNING_WINDOW = 150
 
@@ -165,6 +165,7 @@ def train(M):
                 })
 
             if M.ep % BATCH_SIZE == 0 and M.ep != START_EP:
+                print(M.batch_actions)
                 neg_obj, _ = M.sess.run([M.agent.neg_obj, M.agent.train_op],
                     feed_dict={
                         M.agent.states: np.array(M.batch_states).reshape([-1, 80, 80, 1]),
