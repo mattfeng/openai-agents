@@ -165,7 +165,7 @@ def train(M):
                 })
 
             if M.ep % BATCH_SIZE == 0 and M.ep != START_EP:
-                print(M.batch_actions)
+                # print(M.batch_actions)
                 neg_obj, _ = M.sess.run([M.agent.neg_obj, M.agent.train_op],
                     feed_dict={
                         M.agent.states: np.array(M.batch_states).reshape([-1, 80, 80, 1]),
