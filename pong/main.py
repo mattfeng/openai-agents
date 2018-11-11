@@ -145,7 +145,7 @@ def train(M):
             M.running_mean_ = np.mean(M.running_mean)
             M.batch_states.extend(states)
             M.batch_actions.extend(actions)
-            M.batch_rewards.extend(rewards)
+            M.batch_rewards.extend(discounted_returns_(rewards))
 
             # print(discounted_returns_(np.array(rewards), False))
             # print(discounted_returns(np.array(rewards)))
@@ -169,7 +169,7 @@ def train(M):
                     feed_dict={
                         M.agent.states: np.array(M.batch_states).reshape([-1, 80, 80, 1]),
                         M.agent.actions: np.array(M.batch_actions),
-                        M.agent.discounted_returns: discounted_returns_(np.array(M.batch_rewards))
+                        M.agent.discounted_returns: np.array(M.batch_rewards)
                     })
                 M.batch_states = []
                 M.batch_rewards = []
