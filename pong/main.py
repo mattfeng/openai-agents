@@ -143,47 +143,25 @@ def train(M):
             if len(M.running_mean) > RUNNING_WINDOW:
                 M.running_mean.popleft()
             M.running_mean_ = np.mean(M.running_mean)
-            M.batch_states.extend(states)
-            M.batch_actions.extend(actions)
-            M.batch_rewards.extend(discounted_returns_(rewards))
 
             # print(discounted_returns_(np.array(rewards), False))
             # print(discounted_returns(np.array(rewards)))
 
-            # neg_obj, _ = M.sess.run([M.agent.neg_obj, M.agent.train_op],
-            #     feed_dict={
-            #         M.agent.states: np.array(states).reshape([-1, 80, 80, 1]),
-            #         M.agent.actions: np.array(actions),
-            #         M.agent.discounted_returns: discounted_returns_(np.array(rewards))
-            #     })
-
-            neg_obj = M.sess.run(M.agent.neg_obj,
+            neg_obj, _ = M.sess.run([M.agent.neg_obj, M.agent.train_op],
                 feed_dict={
                     M.agent.states: np.array(states).reshape([-1, 80, 80, 1]),
                     M.agent.actions: np.array(actions),
                     M.agent.discounted_returns: discounted_returns_(np.array(rewards))
                 })
 
-            if M.ep % BATCH_SIZE == 0 and M.ep != START_EP:
-                # print(M.batch_actions)
-                neg_obj, _ = M.sess.run([M.agent.neg_obj, M.agent.train_op],
-                    feed_dict={
-                        M.agent.states: np.array(M.batch_states).reshape([-1, 80, 80, 1]),
-                        M.agent.actions: np.array(M.batch_actions),
-                        M.agent.discounted_returns: np.array(M.batch_rewards)
-                    })
-                M.batch_states = []
-                M.batch_rewards = []
-                M.batch_actions = []
-                print("[i] Updating weights...")
 
-                summary = M.sess.run(M.write_op, feed_dict={
-                    M.agent.neg_obj: neg_obj,
-                    M.agent.mean_return: M.total_return / (M.ep + 1)
-                })
+            summary = M.sess.run(M.write_op, feed_dict={
+                M.agent.neg_obj: neg_obj,
+                M.agent.mean_return: M.total_return / (M.ep + 1)
+            })
 
-                M.writer.add_summary(summary)
-                M.writer.flush()
+            M.writer.add_summary(summary)
+            M.writer.flush()
 
             return episode_return, mean_return, neg_obj
         
@@ -205,10 +183,6 @@ def main():
 
     # Print basic info about the environment
     print("Action set: {}".format(M.env.unwrapped._action_set))
-
-    M.batch_states = []
-    M.batch_actions = []
-    M.batch_rewards = []
 
     M.total_return = 0
     M.saver = tf.train.Saver()
