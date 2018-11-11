@@ -35,7 +35,7 @@ NUM_EPISODES = 1000000
 GAMMA = 0.99
 FRAME_BUFFER_SIZE = 2
 OPTIMIZER_OPTIONS = {
-    "learning_rate": 1e-4,
+    "learning_rate": 1e-3,
     "decay": 0.99
 }
 BATCH_SIZE = 10
@@ -143,9 +143,9 @@ def train(M):
             if len(M.running_mean) > RUNNING_WINDOW:
                 M.running_mean.popleft()
             M.running_mean_ = np.mean(M.running_mean)
-            M.batch_states.append(states)
-            M.batch_actions.append(actions)
-            M.batch_rewards.append(rewards)
+            M.batch_states.extend(states)
+            M.batch_actions.extend(actions)
+            M.batch_rewards.extend(rewards)
 
             # print(discounted_returns_(np.array(rewards), False))
             # print(discounted_returns(np.array(rewards)))
@@ -157,16 +157,24 @@ def train(M):
             #         M.agent.discounted_returns: discounted_returns_(np.array(rewards))
             #     })
 
-            if len(M.batch_states) == BATCH_SIZE:
+            neg_obj = M.sess.run(M.agent.neg_obj,
+                feed_dict={
+                    M.agent.states: np.array(states).reshape([-1, 80, 80, 1]),
+                    M.agent.actions: np.array(actions),
+                    M.agent.discounted_returns: discounted_returns_(np.array(rewards))
+                })
+
+            if M.ep % BATCH_SIZE == 0 and M.ep != START_EP:
                 neg_obj, _ = M.sess.run([M.agent.neg_obj, M.agent.train_op],
                     feed_dict={
-                        M.agent.states: np.array(M.batch_states).reshape([BATCH_SIZE, -1, 80, 80, 1]),
+                        M.agent.states: np.array(M.batch_states).reshape([-1, 80, 80, 1]),
                         M.agent.actions: np.array(M.batch_actions),
-                        M.agent.discounted_returns: np.array(list(map(discounted_returns_, rewards)))
+                        M.agent.discounted_returns: discounted_returns_(np.array(M.batch_rewards))
                     })
                 M.batch_states = []
                 M.batch_rewards = []
                 M.batch_actions = []
+                print("[i] Updating weights...")
 
                 summary = M.sess.run(M.write_op, feed_dict={
                     M.agent.neg_obj: neg_obj,

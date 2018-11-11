@@ -23,15 +23,15 @@ class Agent(object):
         with tf.name_scope("inputs"):
             self.states = tf.placeholder(
                 tf.float32,
-                [10, None, 80, 80, 1],
+                [None, 80, 80, 1],
                 "states")
             self.actions = tf.placeholder(
                 tf.int32,
-                [10, None, 2],
+                [None, 2],
                 "actions")
             self.discounted_returns = tf.placeholder(
                 tf.float32,
-                [10, None,],
+                [None,],
                 "discounted_returns")
 
         with tf.name_scope("model"):
