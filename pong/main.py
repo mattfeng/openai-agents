@@ -26,7 +26,11 @@ DISPLAY_WIDTH = 600
 DISPLAY_HEIGHT = 600
 DISP = os.environ["DISP"] == "y"
 
-START_EP = int(sys.argv[1])
+if len(sys.argv) > 1:
+    START_EP = int(sys.argv[1])
+else:
+    START_EP = 0
+
 NUM_EPISODES = 1000000
 GAMMA = 0.99
 FRAME_BUFFER_SIZE = 2
@@ -34,6 +38,7 @@ OPTIMIZER_OPTIONS = {
     "learning_rate": 1e-4,
     "decay": 0.99
 }
+BATCH_SIZE = 10
 
 RUNNING_WINDOW = 150
 
@@ -138,24 +143,38 @@ def train(M):
             if len(M.running_mean) > RUNNING_WINDOW:
                 M.running_mean.popleft()
             M.running_mean_ = np.mean(M.running_mean)
+            M.batch_states.append(states)
+            M.batch_actions.append(actions)
+            M.batch_rewards.append(rewards)
 
             # print(discounted_returns_(np.array(rewards), False))
             # print(discounted_returns(np.array(rewards)))
 
-            neg_obj, _ = M.sess.run([M.agent.neg_obj, M.agent.train_op],
-                feed_dict={
-                    M.agent.states: np.array(states).reshape([-1, 80, 80, 1]),
-                    M.agent.actions: np.array(actions),
-                    M.agent.discounted_returns: discounted_returns_(np.array(rewards))
+            # neg_obj, _ = M.sess.run([M.agent.neg_obj, M.agent.train_op],
+            #     feed_dict={
+            #         M.agent.states: np.array(states).reshape([-1, 80, 80, 1]),
+            #         M.agent.actions: np.array(actions),
+            #         M.agent.discounted_returns: discounted_returns_(np.array(rewards))
+            #     })
+
+            if len(M.batch_states) == BATCH_SIZE:
+                neg_obj, _ = M.sess.run([M.agent.neg_obj, M.agent.train_op],
+                    feed_dict={
+                        M.agent.states: np.array(M.batch_states).reshape([BATCH_SIZE, -1, 80, 80, 1]),
+                        M.agent.actions: np.array(M.batch_actions),
+                        M.agent.discounted_returns: np.array(list(map(discounted_returns_, rewards)))
+                    })
+                M.batch_states = []
+                M.batch_rewards = []
+                M.batch_actions = []
+
+                summary = M.sess.run(M.write_op, feed_dict={
+                    M.agent.neg_obj: neg_obj,
+                    M.agent.mean_return: M.total_return / (M.ep + 1)
                 })
 
-            summary = M.sess.run(M.write_op, feed_dict={
-                M.agent.neg_obj: neg_obj,
-                M.agent.mean_return: M.total_return / (M.ep + 1)
-            })
-
-            M.writer.add_summary(summary)
-            M.writer.flush()
+                M.writer.add_summary(summary)
+                M.writer.flush()
 
             return episode_return, mean_return, neg_obj
         
@@ -178,6 +197,10 @@ def main():
     # Print basic info about the environment
     print("Action set: {}".format(M.env.unwrapped._action_set))
 
+    M.batch_states = []
+    M.batch_actions = []
+    M.batch_rewards = []
+
     M.total_return = 0
     M.saver = tf.train.Saver()
     M.running_mean = deque()
@@ -187,7 +210,8 @@ def main():
         M.sess = sess
         M.sess.run(tf.global_variables_initializer())
 
-        M.saver.restore(M.sess, "./models/model-{}.cpkt".format(START_EP))
+        if START_EP != 0:
+            M.saver.restore(M.sess, "./models/model-{}.cpkt".format(START_EP))
 
         for ep in range(START_EP, NUM_EPISODES):
             M.ep = ep
