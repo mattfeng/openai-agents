@@ -12,8 +12,8 @@ EPSILON_START = 0.8
 EPSILON_END = 0.1
 EPSILON_DECAY = 0.00075
 TARGET_UPDATE_RATE = 300
-LEARNING_RATE = 0.005
-HIDDEN_SIZE = 8
+LEARNING_RATE = 0.0075
+HIDDEN_SIZE = 16
 
 class DDQNAgent(object):
     """
@@ -75,9 +75,11 @@ class DDQNAgent(object):
         if self.is_learning:
             # make training batch, update current network
             X, y = self._make_training_batch()
-            loss = self.nn.fit(X, y)
+            result = self.nn.fit(X, y)
+            loss = result.history["loss"]
 
             if self.global_step % self.target_update_rate == 0:
+                print("updating network")
                 self.update_target_network()
 
         self.finish_step()
@@ -88,7 +90,7 @@ class DDQNAgent(object):
             self.is_learning = True
         self.global_step += 1
 
-        self.eps = (self.eps_start + (self.eps_start - self.eps_end) *
+        self.eps = (self.eps_end + (self.eps_start - self.eps_end) *
             math.exp(-self.eps_decay * self.global_step))
 
     def update_target_network(self):

@@ -1,5 +1,5 @@
 from keras.layers import Input, Dense
-from keras.models import Model
+from keras.models import Model, Sequential
 from keras.optimizers import SGD
 import numpy as np
 
@@ -7,20 +7,29 @@ class DDQN(object):
 
     def __init__(self, input_size, n_actions, hidden_size, learning_rate):
         self.lr = learning_rate
-        self.input = Input(shape=input_size)
-        self.dense1 = Dense(hidden_size, activation="relu")(self.input)
-        self.dense2 = Dense(hidden_size, activation="relu")(self.dense1)
-        self.qvals = Dense(n_actions, activation="linear")(self.dense2)
-        self.model = Model(inputs=self.input, outputs=self.qvals)
+        # self.input = Input(shape=input_size)
+        # self.dense1 = Dense(hidden_size, activation="relu")(self.input)
+        # self.dense2 = Dense(hidden_size, activation="relu")(self.dense1)
+        # self.qvals = Dense(n_actions, activation="linear")(self.dense2)
+        # self.model = Model(inputs=self.input, outputs=self.qvals)
+        # self.opt = SGD(lr=self.lr, momentum=0.5, decay=1e-6, clipnorm=2)
+        # self.model.summary()
+        # self.model.compile(loss="mean_squared_error", optimizer=self.opt)
+
+        self.model = Sequential()
+        self.model.add(Dense(hidden_size, input_dim=4, activation='tanh'))
+        self.model.add(Dense(hidden_size, activation='tanh'))
+        self.model.add(Dense(n_actions, activation='linear'))
         self.opt = SGD(lr=self.lr, momentum=0.5, decay=1e-6, clipnorm=2)
-        self.model.summary()
-        self.model.compile(loss="mean_squared_error", optimizer=self.opt)
+        self.model.compile(loss='mean_squared_error', optimizer=self.opt)
+
     
     def fit(self, X, y):
         X = np.array(X)
         y = np.array(y)
-        loss = self.model.fit(X, y, nb_epoch=1, shuffle=True, verbose=0)
-        return loss
+        result = self.model.fit(X, y, nb_epoch=1, shuffle=True, verbose=0)
+
+        return result
 
     def estimate_q(self, state):
         """

@@ -8,30 +8,30 @@ NUM_EPISODES = 10000
 def main():
     env = gym.make("CartPole-v0")
     agent = DDQNAgent(env)
-    returns = deque(maxlen=100)
+    rewards = deque([], maxlen=100)
 
     for episode in range(1, NUM_EPISODES + 1):
-        state = env.reset()
+        s = env.reset()
         done = False
-        return_ = 0
+        reward = 0
 
         for j in count(1):
-            action = agent.act(state)
-            state_, reward, done, _ = env.step(action)
-            return_ += reward
-            loss = agent.learn((state, action, reward, state_, done))
-            # env.render()
+            env.render()
+            a = agent.act(s)
+            s_, r, done, _ = env.step(a)
+            reward += r
+            loss = agent.learn((s, a, r, s_, done))
 
             if done:
-                returns.append(return_)
-                avg_return = sum(returns) / len(returns)
-                print(f"[ep{episode}] episode len:{j},"
-                      f"avg return: {avg_return:.6f}, "
-                      f"current ret: {return_:.6f}")
+                rewards.append(reward)
+                avg_return = sum(rewards) / len(rewards)
+                print(f"[ep{episode}] "
+                      f"avg return: {avg_return:.2f}, "
+                      f"current ret: {reward:.2f}, "
+                      f"eps: {agent.eps:.3f}")
                 break
 
-            # transition
-            state = state_
+            s = s_
 
 
 
