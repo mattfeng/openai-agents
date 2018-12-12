@@ -1,4 +1,4 @@
-from keras.layers import Input, Dense
+from keras.layers import Input, Dense, Flatten
 from keras.models import Model, Sequential
 from keras.optimizers import SGD
 import numpy as np
@@ -8,8 +8,11 @@ class DDQN(object):
     def __init__(self, input_size, n_actions, hidden_size, learning_rate):
         self.lr = learning_rate
         self.input = Input(shape=input_size)
-        self.dense1 = Dense(hidden_size, activation="relu")(self.input)
+
+        # self.flatten = Flatten()(self.input)
+        self.dense1 = Dense(hidden_size, activation="relu")(self.flatten)
         self.dense2 = Dense(hidden_size, activation="relu")(self.dense1)
+
         self.qvals = Dense(n_actions, activation="linear")(self.dense2)
         self.model = Model(inputs=self.input, outputs=self.qvals)
         self.opt = SGD(lr=self.lr, momentum=0.5, decay=1e-6, clipnorm=2)
