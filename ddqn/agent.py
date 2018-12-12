@@ -10,7 +10,7 @@ class DDQNAgent(object):
     Defines a double dueling reinforcement learning agent.
     """
 
-    def __init__(self, env, layers):
+    def __init__(self, env, layers, state_shape):
         self.layers = layers
         self.global_step = 1
         self.is_learning = False
@@ -26,7 +26,8 @@ class DDQNAgent(object):
         
         self.env = env
         self.n_actions = self.env.action_space.n
-        self.state_shape = self.env.observation_space.shape
+        # self.state_shape = self.env.observation_space.shape
+        self.state_shape = state_shape
         self.target_nn = self.create_ddqn_model()
         self.nn = self.create_ddqn_model()
         self.memory = ReplayMemory(REPLAY_BUFFER_SIZE)

@@ -1,5 +1,5 @@
-from keras.layers import Input, Dense, Flatten
-from keras.models import Model, Sequential
+from keras.layers import Input, Dense
+from keras.models import Model
 from keras.optimizers import SGD
 import numpy as np
 
