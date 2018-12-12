@@ -73,8 +73,12 @@ class DDQNAgent(object):
                 print("updating network")
                 self.update_target_network()
 
-        self.finish_step()
+        self.notify("finish_step")
         return loss
+    
+    def notify(self, event):
+        for obs in self.observers:
+            obs(event)
     
     def finish_step(self):
         if self.global_step > self.training_step_delay:
