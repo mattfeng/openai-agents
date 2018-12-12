@@ -42,6 +42,9 @@ def main():
         # need to take the difference of frames
         processed_s = preprocess(s, s_)
 
+        prev_num_lives = 5
+        press_fire = False
+
         done = False
         reward = 0
 
@@ -50,7 +53,17 @@ def main():
                 env.render()
 
             a = agent.act(processed_s)
-            s_, r, done, _ = env.step(a)
+
+            if press_fire:
+                a = 1
+                press_fire = False
+
+            s_, r, done, info = env.step(a)
+            num_lives = info["ale.lives"]
+
+            if num_lives < prev_num_lives:
+                press_fire = True
+
             reward += r
 
             # preprocess states
@@ -67,9 +80,9 @@ def main():
                       f"eps: {agent.eps:.3f}")
                 break
 
+            prev_num_lives = num_lives
             processed_s = processed_s_
             s = s_
-
 
 
 if __name__ == "__main__":
