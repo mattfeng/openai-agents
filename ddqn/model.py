@@ -5,28 +5,20 @@ import numpy as np
 
 class DDQN(object):
 
-    def __init__(self, input_size, n_actions, hidden_size, learning_rate):
+    def __init__(self, input_size, n_actions, layers, learning_rate):
         self.lr = learning_rate
         self.input = Input(shape=input_size)
 
-        # self.flatten = Flatten()(self.input)
-        self.dense1 = Dense(hidden_size, activation="relu")(self.flatten)
-        self.dense2 = Dense(hidden_size, activation="relu")(self.dense1)
-
-        self.qvals = Dense(n_actions, activation="linear")(self.dense2)
+        prev_layer = self.input
+        for layer in layers:
+            prev_layer = layer(prev_layer)
+        
+        self.qvals = Dense(n_actions, activation="linear")(prev_layer)
         self.model = Model(inputs=self.input, outputs=self.qvals)
         self.opt = SGD(lr=self.lr, momentum=0.5, decay=1e-6, clipnorm=2)
         self.model.summary()
         self.model.compile(loss="mean_squared_error", optimizer=self.opt)
 
-        # self.model = Sequential()
-        # self.model.add(Dense(hidden_size, input_dim=4, activation='tanh'))
-        # self.model.add(Dense(hidden_size, activation='tanh'))
-        # self.model.add(Dense(n_actions, activation='linear'))
-        # self.opt = SGD(lr=self.lr, momentum=0.5, decay=1e-6, clipnorm=2)
-        # self.model.compile(loss='mean_squared_error', optimizer=self.opt)
-
-    
     def fit(self, X, y):
         X = np.array(X)
         y = np.array(y)

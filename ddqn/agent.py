@@ -3,24 +3,15 @@ import numpy as np
 import random
 from model import DDQN
 from memory import ReplayMemory
-
-REPLAY_BUFFER_SIZE = 50000
-TRAINING_SAMPLE_SIZE = 32
-TRAINING_STEP_DELAY = 100
-DISCOUNT_FACTOR = 0.99
-EPSILON_START = 0.8
-EPSILON_END = 0.1
-EPSILON_DECAY = 0.00075
-TARGET_UPDATE_RATE = 300
-LEARNING_RATE = 0.0075
-HIDDEN_SIZE = 16
+from params import *
 
 class DDQNAgent(object):
     """
     Defines a double dueling reinforcement learning agent.
     """
 
-    def __init__(self, env):
+    def __init__(self, env, layers):
+        self.layers = layers
         self.global_step = 1
         self.is_learning = False
         self.training_step_delay = TRAINING_STEP_DELAY
@@ -32,7 +23,6 @@ class DDQNAgent(object):
         self.batch_size = TRAINING_SAMPLE_SIZE
         self.target_update_rate = TARGET_UPDATE_RATE
         self.lr = LEARNING_RATE
-        self.hidden_size = HIDDEN_SIZE
         
         self.env = env
         self.n_actions = self.env.action_space.n
@@ -45,7 +35,7 @@ class DDQNAgent(object):
     def create_ddqn_model(self):
         return DDQN(self.state_shape,
                     self.n_actions,
-                    self.hidden_size,
+                    self.layers,
                     self.lr)
     
     def act(self, state):
