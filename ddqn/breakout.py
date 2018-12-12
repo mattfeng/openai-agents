@@ -4,9 +4,11 @@ from agent import DDQNAgent
 from itertools import count
 from collections import deque
 from keras.layers import Dense, Conv2D, Flatten
+import os
 import numpy as np
 import gym
 
+RENDER = os.environ["RENDER"] == "Y"
 NUM_EPISODES = 10000
 
 def define_model():
@@ -44,7 +46,8 @@ def main():
         reward = 0
 
         for j in count(1):
-            env.render()
+            if RENDER:
+                env.render()
 
             a = agent.act(processed_s)
             s_, r, done, _ = env.step(a)
