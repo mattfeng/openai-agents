@@ -31,7 +31,7 @@ def preprocess(s, s_):
     return s_ - s
 
 def main():
-    env = gym.make("BreakoutDeterministic-v0")
+    env = gym.make("PongDeterministic-v0")
     agent = DDQNAgent(env, define_model(), (210, 160, 1))
     rewards = deque([], maxlen=100)
 
