@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from agent import DDQNAgent
 from itertools import count
 from collections import deque
