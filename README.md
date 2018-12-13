@@ -5,7 +5,7 @@
 
 ## Showcase
 ### Vanilla Policy Gradient
-<img src="./assets/pg-cartpole.gif" />
+<img src="./assets/pg-cartpole.gif" width="400px"/>
 
 ### Double Deep Q-Networks
 
