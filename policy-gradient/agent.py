@@ -18,6 +18,9 @@ class VanillaPolicyGradientAgent(object):
         self._define_model()
         self.sess.run(tf.global_variables_initializer())
 
+        # define observers
+        self.observers = []
+
     def _define_model(self):
         self.states = tf.placeholder(tf.float32,
             shape=(None, 4), name="Input")
@@ -73,7 +76,13 @@ class VanillaPolicyGradientAgent(object):
             }
         )
         return loss
+    
+    def add_observer(self, obs):
+        self.observers.append(obs)
         
+    def notify(self, event):
+        for obs in self.observers:
+            obs(event)
 
 if __name__ == "__main__":
     env = gym.make("CartPole-v0")
