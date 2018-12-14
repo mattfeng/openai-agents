@@ -58,7 +58,9 @@ class VanillaPolicyGradientAgent(object):
             tf.reduce_sum(self.traj_advantages * self.action_logprobs),
             self.num_traj)
 
-        self.optimizer = tf.train.RMSPropOptimizer(self.hp["learning_rate"])
+        self.optimizer = tf.train.RMSPropOptimizer(
+            self.hp["learning_rate"],
+            decay=self.hp["decay_rate"])
         self.train = self.optimizer.minimize(self.loss)
 
     

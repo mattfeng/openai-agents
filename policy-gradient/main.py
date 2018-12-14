@@ -24,7 +24,8 @@ def cartpole():
 def pong():
     HPARAMS = {
         "learning_rate": 0.0001,
-        "hidden_size": 200
+        "hidden_size": 200,
+        "decay_rate"
     }
     NUM_EPOCHS = 10000
     BATCH_SIZE = 10
