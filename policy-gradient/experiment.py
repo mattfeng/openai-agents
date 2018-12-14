@@ -18,16 +18,13 @@ class Experiment():
         # create the environment
         self.key = key
         self.env = gym.make(self.key)
-        print(f"Building environment: {self.key}")
 
         # create a TF session
         self.sess = tf.Session()
 
         # create the agent and initialize its variables
         self.hparams = hparams
-        self.agent = VanillaPolicyGradientAgent(self.env,
-            self.sess, self.hparams)
-        self.agent.add_observer(StepObserver(self.agent))
+        self._define_agent()
         self.sess.run(tf.global_variables_initializer())
 
         # define other parameters
@@ -39,6 +36,11 @@ class Experiment():
         # bookkeeping variables
         self.return_buffer = deque([], maxlen=100)
     
+    def _define_agent(self):
+        self.agent = VanillaPolicyGradientAgent(self.env,
+            self.sess, self.hparams)
+        self.agent.add_observer(StepObserver(self.agent))
+
     def run(self):
         for epoch in range(1, self.num_epochs + 1):
             b_states, b_actions, b_advantages = [], [], []

@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 
-from experiment import Experiment
-
-class CartPoleExperiment(Experiment):
-    pass
+from cartpole import CartPoleExperiment
+from pong import PongExperiment
 
 def cartpole():
     HPARAMS = {
-        "learning_rate": 0.03
+        "learning_rate": 0.03,
+        "hidden_size": 16
     }
     NUM_EPOCHS = 100
     BATCH_SIZE = 10
@@ -22,8 +21,27 @@ def cartpole():
             DISCOUNT_FACTOR)
     exp.run()
 
+def pong():
+    HPARAMS = {
+        "learning_rate": 0.03,
+        "hidden_size": 128
+    }
+    NUM_EPOCHS = 10000
+    BATCH_SIZE = 10
+    RENDER = False
+    DISCOUNT_FACTOR = 0.99
+    exp = PongExperiment(
+            "PongDeterministic-v0",
+            HPARAMS,
+            NUM_EPOCHS,
+            BATCH_SIZE,
+            RENDER,
+            DISCOUNT_FACTOR)
+    exp.run()
+
 def main():
-    cartpole()
+    # cartpole()
+    pong()
 
 if __name__ == "__main__":
     main()

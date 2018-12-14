@@ -4,7 +4,7 @@ import gym
 from keras.layers import Dense
 
 class VanillaPolicyGradientAgent(object):
-    def __init__(self, env, sess, hparams):
+    def __init__(self, env, sess, hparams, input_shape=None):
         """
             env: OpenAI Gym envrionment
             sess: TensorFlow session
@@ -13,6 +13,9 @@ class VanillaPolicyGradientAgent(object):
         self.sess = sess
         self.n_actions = self.env.action_space.n
         self.hp = hparams
+        self.input_shape = input_shape
+        if self.input_shape is None:
+            self.input_shape = self.env.observation_space.shape
 
         # define the model for the policy network
         self._define_model()
@@ -23,11 +26,11 @@ class VanillaPolicyGradientAgent(object):
 
     def _define_model(self):
         self.states = tf.placeholder(tf.float32,
-            shape=(None, 4), name="Input")
+            shape=(None, *self.input_shape), name="Input")
         
         # define the model internals here
-        self.dense1 = Dense(16)(self.states)
-        self.dense2 = Dense(16)(self.dense1)
+        self.dense1 = Dense(self.hp["hidden_size"])(self.states)
+        self.dense2 = Dense(self.hp["hidden_size"])(self.dense1)
         
         self.probs = Dense(self.n_actions,
             activation="softmax")(self.dense2)
