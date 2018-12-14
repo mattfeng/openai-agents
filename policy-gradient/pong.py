@@ -37,7 +37,7 @@ class PongExperiment(Experiment):
         s[s[:, :] == [109, 118, 43]] = 0
         s[~(s[:, :] == [0, 0, 0])] = 255
         s = s[33:193, :, 0]
-        s = s[::2, ::2]
+        s = s.astype(np.float32)[::2, ::2]
         s /= 255.0
         s -= 0.5
         return s
