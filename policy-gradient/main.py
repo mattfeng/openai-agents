@@ -6,7 +6,8 @@ from pong import PongExperiment
 def cartpole():
     HPARAMS = {
         "learning_rate": 0.03,
-        "hidden_size": 16
+        "hidden_size": 16,
+        "decay_rate": 0.9
     }
     NUM_EPOCHS = 100
     BATCH_SIZE = 10
@@ -25,7 +26,7 @@ def pong():
     HPARAMS = {
         "learning_rate": 0.0001,
         "hidden_size": 200,
-        "decay_rate"
+        "decay_rate": 0.99
     }
     NUM_EPOCHS = 10000
     BATCH_SIZE = 10
