@@ -23,11 +23,11 @@ def cartpole():
 
 def pong():
     HPARAMS = {
-        "learning_rate": 0.0075,
-        "hidden_size": 128
+        "learning_rate": 0.0001,
+        "hidden_size": 200
     }
     NUM_EPOCHS = 10000
-    BATCH_SIZE = 32
+    BATCH_SIZE = 10
     RENDER = False
     DISCOUNT_FACTOR = 0.99
     exp = PongExperiment(

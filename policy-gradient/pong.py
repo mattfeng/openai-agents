@@ -13,7 +13,7 @@ import numpy as np
 class PongExperiment(Experiment):
     def _define_agent(self):
         self.agent = VanillaPolicyGradientAgent(self.env,
-            self.sess, self.hparams, input_shape=(7056,))
+            self.sess, self.hparams, input_shape=(6400,))
         self.agent.add_observer(StepObserver(self.agent))
 
     def _accumulate(self, rewards):
@@ -36,8 +36,8 @@ class PongExperiment(Experiment):
     def _preprocess(self, s):
         s[s[:, :] == [109, 118, 43]] = 0
         s[~(s[:, :] == [0, 0, 0])] = 255
-        s = s[32:192, :, 0]
-        s = resize(s, (84, 84), anti_aliasing=False)
+        s = s[33:193, :, 0]
+        s = s[::2, ::2]
         s /= 255
         s -= 0.5
         return s
