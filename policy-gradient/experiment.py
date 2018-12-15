@@ -13,9 +13,9 @@ class Experiment():
                  hparams,
                  num_epochs,
                  batch_size,
-                 render,
-                 discount_factor,
-                 load_from_previous):
+                 render=True,
+                 discount_factor=0.99,
+                 load_from_previous=False):
         # create the environment
         self.key = key
         self.env = gym.make(self.key)

@@ -18,8 +18,8 @@ def cartpole():
             HPARAMS,
             NUM_EPOCHS,
             BATCH_SIZE,
-            RENDER,
-            DISCOUNT_FACTOR)
+            render=RENDER,
+            discount_factor=DISCOUNT_FACTOR)
     exp.run()
 
 def pong():
@@ -37,8 +37,8 @@ def pong():
             HPARAMS,
             NUM_EPOCHS,
             BATCH_SIZE,
-            RENDER,
-            DISCOUNT_FACTOR)
+            render=RENDER,
+            discount_factor=DISCOUNT_FACTOR)
     exp.run()
 
 def main():
