@@ -14,7 +14,8 @@ class Experiment():
                  num_epochs,
                  batch_size,
                  render,
-                 discount_factor):
+                 discount_factor,
+                 load_from_previous):
         # create the environment
         self.key = key
         self.env = gym.make(self.key)
@@ -35,6 +36,11 @@ class Experiment():
 
         # bookkeeping variables
         self.return_buffer = deque([], maxlen=100)
+
+        # create a TF saver
+        self.saver = tf.train.Saver()
+        if load_from_previous:
+            self.saver.restore(self.sess, "model.ckpt")
     
     def _define_agent(self):
         self.agent = VanillaPolicyGradientAgent(self.env,
@@ -65,7 +71,7 @@ class Experiment():
 
             loss = self.agent.learn(b_states, b_actions, b_advantages, self.batch_size)
             print(f"[epoch_{epoch}] loss={loss:.4f}")
-
+            self.saver.save(self.sess, "model.ckpt")
 
     def _accumulate(self, rewards):
         advantages = np.zeros_like(rewards)
