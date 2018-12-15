@@ -16,31 +16,29 @@ class PongExperiment(Experiment):
             self.sess, self.hparams, input_shape=(6400,))
         self.agent.add_observer(StepObserver(self.agent))
 
-    def _accumulate(self, rewards):
-        advantages = np.zeros_like(rewards)
-
-        acc = 0
-        for ix, r in enumerate(rewards[::-1]):
-            # if you lose a point, don't leave a trace for all the previous moves
-            if r != 0:
-                acc = 0
-            acc = self.gamma * acc + r
-            advantages[len(rewards) - ix - 1] = acc
-
-
-        advantages -= np.mean(advantages)
-        advantages /= np.std(advantages)
+    def _accumulate(self, r):
+        r = np.array(r)
+        discounted_r = np.zeros_like(r)
+        running_add = 0
+        for t in reversed(range(0, r.size)):
+            # reset the sum, since this was a game boundary (pong specific!)
+            if r[t] != 0:
+                running_add = 0
+            running_add = running_add * self.gamma + r[t]
+            discounted_r[t] = running_add
         
-        return advantages
-    
-    def _preprocess(self, s):
-        s[s[:, :] == [109, 118, 43]] = 0
-        s[~(s[:, :] == [0, 0, 0])] = 255
-        s = s[33:193, :, 0]
-        s = s.astype(np.float32)[::2, ::2]
-        s /= 255.0
-        s -= 0.5
-        return s
+        discounted_r -= np.mean(discounted_r)
+        discounted_r /= np.std(discounted_r)
+
+        return discounted_r
+
+    def _preprocess(self, I):
+        I = I[35:195] # crop
+        I = I[::2,::2,0] # downsample by factor of 2
+        I[I == 144] = 0 # erase background (background type 1)
+        I[I == 109] = 0 # erase background (background type 2)
+        I[I != 0] = 1 # everything else (paddles, ball) just set to 1
+        return I.astype(np.float32)
 
     def _process(self, s, s_):
         s = self._preprocess(s)
@@ -68,6 +66,10 @@ class PongExperiment(Experiment):
 
             s = s_
             s_, r, done, _ = self.env.step(a)
+            if r == 1:
+                print("+1!!")
+            elif r == -1:
+                print("-1")
 
             states.append(ps)
             actions.append(a)
