@@ -21,12 +21,12 @@ class PongExperiment(Experiment):
 
         acc = 0
         for ix, r in enumerate(rewards[::-1]):
+            # if you lose a point, don't leave a trace for all the previous moves
+            if r != 0:
+                acc = 0
             acc = self.gamma * acc + r
             advantages[len(rewards) - ix - 1] = acc
 
-            # if you lose a point, don't leave a trace for all the previous moves
-            if r < 0:
-                acc = 0
 
         advantages -= np.mean(advantages)
         advantages /= np.std(advantages)
