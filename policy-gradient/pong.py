@@ -5,6 +5,7 @@ from skimage import color
 from skimage.transform import resize
 from sklearn.preprocessing import binarize
 from collections import deque
+import time
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -60,6 +61,9 @@ class PongExperiment(Experiment):
         while not done:
             if self.render:
                 self.env.render()
+            
+            if self.test_mode:
+                time.sleep(0.02)
             
             ps = self._process(s, s_)
             a = self.agent.act(ps)

@@ -30,15 +30,17 @@ def pong():
     }
     NUM_EPOCHS = 10000
     BATCH_SIZE = 10
-    RENDER = False
     DISCOUNT_FACTOR = 0.99
     exp = PongExperiment(
             "PongDeterministic-v0",
             HPARAMS,
             NUM_EPOCHS,
             BATCH_SIZE,
-            render=RENDER,
-            discount_factor=DISCOUNT_FACTOR)
+            render=True,
+            discount_factor=DISCOUNT_FACTOR,
+            save=False,
+            test_mode=True,
+            load_from_previous=True)
     exp.run()
 
 def main():

@@ -3,6 +3,7 @@
 from agent import VanillaPolicyGradientAgent
 from observers import StepObserver
 from collections import deque
+import time
 import numpy as np
 import tensorflow as tf
 import gym
@@ -15,7 +16,9 @@ class Experiment():
                  batch_size,
                  render=True,
                  discount_factor=0.99,
-                 load_from_previous=False):
+                 load_from_previous=False,
+                 save=False,
+                 test_mode=False):
         # create the environment
         self.key = key
         self.env = gym.make(self.key)
@@ -38,9 +41,13 @@ class Experiment():
         self.return_buffer = deque([], maxlen=100)
 
         # create a TF saver
+        self.save = save
         self.saver = tf.train.Saver()
         if load_from_previous:
-            self.saver.restore(self.sess, "./model.ckpt")
+            self.saver.restore(self.sess, "./model/model.ckpt")
+        
+        # are we in test mode?
+        self.test_mode = test_mode
     
     def _define_agent(self):
         self.agent = VanillaPolicyGradientAgent(self.env,
@@ -69,9 +76,12 @@ class Experiment():
             b_actions = np.array(b_actions)
             b_advantages = np.array(b_advantages)
 
-            loss = self.agent.learn(b_states, b_actions, b_advantages, self.batch_size)
-            print(f"[epoch_{epoch}] loss={loss:.4f}")
-            self.saver.save(self.sess, "./model.ckpt")
+            if not self.test_mode:
+                loss = self.agent.learn(b_states, b_actions, b_advantages, self.batch_size)
+                print(f"[epoch_{epoch}] loss={loss:.4f}")
+
+            if self.save:
+                self.saver.save(self.sess, "./model.ckpt")
 
     def _accumulate(self, rewards):
         advantages = np.zeros_like(rewards)
@@ -94,7 +104,7 @@ class Experiment():
         while not done:
             if self.render:
                 self.env.render()
-            
+
             a = self.agent.act(s)
             s_, r, done, _ = self.env.step(a)
             states.append(s)
